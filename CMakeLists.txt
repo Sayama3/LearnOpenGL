@@ -1,6 +1,22 @@
 cmake_minimum_required(VERSION 3.25)
+
+# set enable the debugger (when the debug mode is enable?)
+set(CMAKE_CXX_FLAGS_DEBUG_INIT "-g")
+
+# for visual studio : enable the math define
+add_definitions(-D_USE_MATH_DEFINES)
+
+# we use the c++ 20
+set(CMAKE_CXX_STANDARD 20)
+
 project(LearnOpenGL)
 
-set(CMAKE_CXX_STANDARD 17)
+add_executable(OpenGL)
 
-add_executable(LearnOpenGL src/main.cpp)
+# remark the c++ version to the 20 one
+target_compile_features(OpenGL PUBLIC cxx_std_20)
+
+# add the .hpp to the projects
+include_directories(include)
+add_subdirectory(src)
+add_subdirectory(lib)
