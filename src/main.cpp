@@ -40,8 +40,8 @@ int main() {
 
 
     // === Shaders ===
-    ShaderProgram _shaderProgram("resources/shaders/shader.vert", ShaderType::VERTEX_SHADER,
-                                 "resources/shaders/shader.frag", ShaderType::FRAGMENT_SHADER);
+    ShaderProgram shaderProgram("resources/shaders/shader.vert", ShaderType::VERTEX_SHADER,
+                                "resources/shaders/shader.frag", ShaderType::FRAGMENT_SHADER);
 
     // 1. bind Vertex Array Object
     VertexArrayObject vao;
@@ -54,7 +54,7 @@ int main() {
             -0.25f, 0.5f, 0.0f, // top right
             -0.25f, -0.5f, 0.0f, // bottom right
             -0.75f, -0.5f, 0.0f, // bottom left
-            -0.75f, 0.5f, 0.0f // top left
+            -0.75f, 0.5f, 0.0f, // top left
     };
     unsigned int indicesArray1[] = { // note that we start from 0!
             0, 1, 3, // first triangle
@@ -83,15 +83,23 @@ int main() {
     indices.Unbind();
 
     float verticesArray2[] = {
-            0.75f, 0.5f, 0.0f, // top right
-            0.75f, -0.5f, 0.0f, // bottom right
-            0.25f, -0.5f, 0.0f, // bottom left
-            0.25f, 0.5f, 0.0f // top left
+            0.75f, 0.75f, 0.0f, // top right 1 (0)
+            0.75f, 0.25f, 0.0f, // bottom right 1 (1)
+            0.25f, 0.25f, 0.0f, // bottom left 1 (2)
+            0.25f, 0.75f, 0.0f, // top left 1 (3)
+            0.75f, -0.25f, 0.0f, // top right 2 (4)
+            0.75f, -0.75f, 0.0f, // bottom right 2 (5)
+            0.25f, -0.75f, 0.0f, // bottom left 2 (6)
+            0.25f, -0.25f, 0.0f, // top left 2 (7)
     };
     unsigned int indicesArray2[] = { // note that we start from 0!
             0, 1, 3, // first triangle
-            1, 2, 3 // second triangle
+            1, 2, 3, // second triangle
+            4, 5, 7, // third triangle
+            5, 6, 7, // fourth triangle
     };
+    ShaderProgram shaderProgram2("resources/shaders/shader.vert", ShaderType::VERTEX_SHADER,
+                                "resources/shaders/shader2.frag", ShaderType::FRAGMENT_SHADER);
     VertexArrayObject vao2;
     vao2.Bind();
 
@@ -121,11 +129,12 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         // 4. draw the object
-        _shaderProgram.Bind();
+        shaderProgram.Bind();
         vao.Bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        shaderProgram2.Bind();
         vao2.Bind();
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
         // check and call events and swap the buffers
         glfwSwapBuffers(window);
