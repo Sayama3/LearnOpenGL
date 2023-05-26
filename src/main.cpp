@@ -98,32 +98,32 @@ int main() {
     }
 
 
-   // 1. bind Vertex Array Object
+    // 1. bind Vertex Array Object
     VertexArrayObject vao;
     vao.Bind();
 
     // My First Triangle
-    // TODO: change this for an array of triangles, that are an alias for 3 vertices1, which are in turn 3 floats.
+    // TODO: change this for an array of triangles, that are an alias for 3 verticesArray1, which are in turn 3 floats.
     //  Just me thinking it would be better, not especially true though.
-    float vertices1[] = {
+    float verticesArray1[] = {
             -0.25f, 0.5f, 0.0f, // top right
             -0.25f, -0.5f, 0.0f, // bottom right
             -0.75f, -0.5f, 0.0f, // bottom left
             -0.75f, 0.5f, 0.0f // top left
     };
-    unsigned int indices1[] = { // note that we start from 0!
+    unsigned int indicesArray1[] = { // note that we start from 0!
             0, 1, 3, // first triangle
             1, 2, 3 // second triangle
     };
 
     // The Vertex Buffer Object.
-    // 2.1 copy our vertices1 array in a buffer for OpenGL to use
-    Vertices vertices(vertices1, sizeof(vertices1), BufferUsage::STATIC_DRAW);
+    // 2.1 copy our verticesArray1 array in a buffer for OpenGL to use
+    Vertices vertices(verticesArray1, sizeof(verticesArray1), BufferUsage::STATIC_DRAW);
     vertices.Bind();
 
-    // The Element Buffer Object (st<ore the indices1 of the vertices1)
-    // 2.2 copy our indices1 array in a buffer for OpenGL to use
-    Indices indices(indices1, sizeof(indices1) / sizeof(indices1[0]), BufferUsage::STATIC_DRAW);
+    // The Element Buffer Object (st<ore the indicesArray1 of the verticesArray1)
+    // 2.2 copy our indicesArray1 array in a buffer for OpenGL to use
+    Indices indices(indicesArray1, sizeof(indicesArray1) / sizeof(indicesArray1[0]), BufferUsage::STATIC_DRAW);
     indices.Bind();
 
     // 3. then set the vertex attributes pointers
@@ -137,16 +137,34 @@ int main() {
     vertices.Unbind();
     indices.Unbind();
 
-    // float vertices2[] = {
-    //         0.75f, 0.5f, 0.0f, // top right
-    //         0.75f, -0.5f, 0.0f, // bottom right
-    //         0.25f, -0.5f, 0.0f, // bottom left
-    //         0.25f, 0.5f, 0.0f // top left
-    // };
-    // unsigned int indices2[] = { // note that we start from 0!
-    //         0, 1, 3, // first triangle
-    //         1, 2, 3 // second triangle
-    // };
+    float verticesArray2[] = {
+            0.75f, 0.5f, 0.0f, // top right
+            0.75f, -0.5f, 0.0f, // bottom right
+            0.25f, -0.5f, 0.0f, // bottom left
+            0.25f, 0.5f, 0.0f // top left
+    };
+    unsigned int indicesArray2[] = { // note that we start from 0!
+            0, 1, 3, // first triangle
+            1, 2, 3 // second triangle
+    };
+    VertexArrayObject vao2;
+    vao2.Bind();
+
+    Vertices vertices2(verticesArray2, sizeof(verticesArray2), BufferUsage::STATIC_DRAW);
+    vertices.Bind();
+
+    Indices indices2(indicesArray2, sizeof(indicesArray2) / sizeof(indicesArray2[0]), BufferUsage::STATIC_DRAW);
+    indices2.Bind();
+
+    VertexBufferLayout layout2;
+    layout2.Push<float>(3);
+
+    vao2.AddVertex(vertices2, layout2);
+
+    vao2.Unbind();
+    vertices2.Unbind();
+    indices2.Unbind();
+
 
     // Rendering
     while(!glfwWindowShouldClose(window))
@@ -160,6 +178,8 @@ int main() {
         // 4. draw the object
         glUseProgram(shaderProgram);
         vao.Bind();
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        vao2.Bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // check and call events and swap the buffers
