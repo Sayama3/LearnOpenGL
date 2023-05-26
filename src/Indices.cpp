@@ -4,7 +4,7 @@
 
 #include "Indices.hpp"
 
-Indices::Indices(const unsigned int *indices, unsigned int count, BufferUsage bufferUsage) : m_BufferId(), m_BufferType(BufferType::ARRAY_BUFFER) {
+Indices::Indices(const unsigned int *indices, unsigned int count, BufferUsage bufferUsage) : m_BufferId(), m_BufferType(BufferType::ELEMENT_ARRAY_BUFFER) {
     glGenBuffers(1, &this->m_BufferId);
     glBindBuffer(m_BufferType, m_BufferId);
     glBufferData(m_BufferType, count * sizeof(unsigned int), indices, bufferUsage);
