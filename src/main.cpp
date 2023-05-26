@@ -3,6 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <string>
 #include "SystemHelper.hpp"
+#include "Vertices.hpp"
+#include "Indices.hpp"
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -101,38 +103,33 @@ int main() {
     glBindVertexArray(VAO);
 
     // My First Triangle
-    // TODO: change this for an array of triangles, that are an alias for 3 vertices, which are in turn 3 floats.
+    // TODO: change this for an array of triangles, that are an alias for 3 vertices1, which are in turn 3 floats.
     //  Just me thinking it would be better, not especially true though.
-    // float vertices[] = {
+    // float vertices1[] = {
     //         -0.5f, -0.5f, 0.0f,
     //         0.5f, -0.5f, 0.0f,
     //         0.0f, 0.5f, 0.0f
     // };
-    float vertices[] = {
-            0.5f, 0.5f, 0.0f, // top right
-            0.5f, -0.5f, 0.0f, // bottom right
-            -0.5f, -0.5f, 0.0f, // bottom left
-            -0.5f, 0.5f, 0.0f // top left
+    float vertices1[] = {
+            -0.25f, 0.5f, 0.0f, // top right
+            -0.25f, -0.5f, 0.0f, // bottom right
+            -0.75f, -0.5f, 0.0f, // bottom left
+            -0.75f, 0.5f, 0.0f // top left
     };
-    unsigned int indices[] = { // note that we start from 0!
+    unsigned int indices1[] = { // note that we start from 0!
             0, 1, 3, // first triangle
             1, 2, 3 // second triangle
     };
 
     // The Vertex Buffer Object.
-    // 2.1 copy our vertices array in a buffer for OpenGL to use
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    // 2.1 copy our vertices1 array in a buffer for OpenGL to use
+    Vertices vertices(vertices1, sizeof(vertices1), BufferUsage::STATIC_DRAW);
+    vertices.Bind();
 
-    // The Element Buffer Object (store the indices of the vertices)
-    // 2.2 copy our indices array in a buffer for OpenGL to use
-    unsigned int EBO;
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,GL_STATIC_DRAW);
-
+    // The Element Buffer Object (st<ore the indices1 of the vertices1)
+    // 2.2 copy our indices1 array in a buffer for OpenGL to use
+    Indices indices(indices1, sizeof(indices1) / sizeof(indices1[0]), BufferUsage::STATIC_DRAW);
+    indices.Bind();
 
     // 3. then set the vertex attributes pointers
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void *)0);
@@ -146,6 +143,17 @@ int main() {
 
     // We can unbind the EBO only AFTER we unbind the VAO. Else, we unbind it from the VAO.
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    // float vertices2[] = {
+    //         0.75f, 0.5f, 0.0f, // top right
+    //         0.75f, -0.5f, 0.0f, // bottom right
+    //         0.25f, -0.5f, 0.0f, // bottom left
+    //         0.25f, 0.5f, 0.0f // top left
+    // };
+    // unsigned int indices2[] = { // note that we start from 0!
+    //         0, 1, 3, // first triangle
+    //         1, 2, 3 // second triangle
+    // };
 
     // Rendering
     while(!glfwWindowShouldClose(window))
