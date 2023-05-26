@@ -94,38 +94,58 @@ int main() {
         glDeleteShader(vertexShader);
     }
 
-    // My First Triangle
-    // TODO: change this for an array of triangles, that are an alias for 3 vertices, which are in turn 3 floats.
-    //  Just me thinking it would be better, not especially true though.
-    // 0. Creation of our mesh.
-    float vertices[] = {
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            0.0f, 0.5f, 0.0f
-    };
 
     // 1. bind Vertex Array Object
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
+    // My First Triangle
+    // TODO: change this for an array of triangles, that are an alias for 3 vertices, which are in turn 3 floats.
+    //  Just me thinking it would be better, not especially true though.
+    // float vertices[] = {
+    //         -0.5f, -0.5f, 0.0f,
+    //         0.5f, -0.5f, 0.0f,
+    //         0.0f, 0.5f, 0.0f
+    // };
+    float vertices[] = {
+            0.5f, 0.5f, 0.0f, // top right
+            0.5f, -0.5f, 0.0f, // bottom right
+            -0.5f, -0.5f, 0.0f, // bottom left
+            -0.5f, 0.5f, 0.0f // top left
+    };
+    unsigned int indices[] = { // note that we start from 0!
+            0, 1, 3, // first triangle
+            1, 2, 3 // second triangle
+    };
+
     // The Vertex Buffer Object.
+    // 2.1 copy our vertices array in a buffer for OpenGL to use
     unsigned int VBO;
     glGenBuffers(1, &VBO);
-    // 2. copy our vertices array in a buffer for OpenGL to use
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // The Element Buffer Object (store the indices of the vertices)
+    // 2.2 copy our indices array in a buffer for OpenGL to use
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,GL_STATIC_DRAW);
+
 
     // 3. then set the vertex attributes pointers
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void *)0);
     glEnableVertexAttribArray(0);
 
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
     // You can unbind the VAO afterward so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyway, so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // We can unbind the EBO only AFTER we unbind the VAO. Else, we unbind it from the VAO.
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     // Rendering
     while(!glfwWindowShouldClose(window))
@@ -139,7 +159,7 @@ int main() {
         // 4. draw the object
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
 
         // check and call events and swap the buffers
         glfwSwapBuffers(window);
