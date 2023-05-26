@@ -5,4 +5,6 @@ target_sources(OpenGL PRIVATE
         main.cpp
         Indices.cpp
         Vertices.cpp
+        VertexArrayObject.cpp
+        VertexBufferLayout.cpp
         )

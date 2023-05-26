@@ -5,6 +5,7 @@
 #include "SystemHelper.hpp"
 #include "Vertices.hpp"
 #include "Indices.hpp"
+#include "VertexArrayObject.hpp"
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -97,19 +98,13 @@ int main() {
     }
 
 
-    // 1. bind Vertex Array Object
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
+   // 1. bind Vertex Array Object
+    VertexArrayObject vao;
+    vao.Bind();
 
     // My First Triangle
     // TODO: change this for an array of triangles, that are an alias for 3 vertices1, which are in turn 3 floats.
     //  Just me thinking it would be better, not especially true though.
-    // float vertices1[] = {
-    //         -0.5f, -0.5f, 0.0f,
-    //         0.5f, -0.5f, 0.0f,
-    //         0.0f, 0.5f, 0.0f
-    // };
     float vertices1[] = {
             -0.25f, 0.5f, 0.0f, // top right
             -0.25f, -0.5f, 0.0f, // bottom right
@@ -132,17 +127,15 @@ int main() {
     indices.Bind();
 
     // 3. then set the vertex attributes pointers
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void *)0);
-    glEnableVertexAttribArray(0);
+    VertexBufferLayout layout;
+    layout.Push<float>(3);
+    vao.AddVertex(vertices, layout);
 
     // You can unbind the VAO afterward so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyway, so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // We can unbind the EBO only AFTER we unbind the VAO. Else, we unbind it from the VAO.
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    vao.Unbind();
+    vertices.Unbind();
+    indices.Unbind();
 
     // float vertices2[] = {
     //         0.75f, 0.5f, 0.0f, // top right
@@ -166,8 +159,8 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
         // 4. draw the object
         glUseProgram(shaderProgram);
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
+        vao.Bind();
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // check and call events and swap the buffers
         glfwSwapBuffers(window);
