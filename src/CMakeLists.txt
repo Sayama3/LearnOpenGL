@@ -7,4 +7,6 @@ target_sources(OpenGL PRIVATE
         Vertices.cpp
         VertexArrayObject.cpp
         VertexBufferLayout.cpp
+        Shader.cpp
+        ShaderProgram.cpp
         )
