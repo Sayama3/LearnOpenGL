@@ -12,6 +12,7 @@
     <excludeRoots>
       <file path="$PROJECT_DIR$/.github" />
       <file path="$PROJECT_DIR$/build" />
+      <file path="$PROJECT_DIR$/docs" />
     </excludeRoots>
   </component>
 </project>
