@@ -98,24 +98,6 @@ jobs:
           ${{github.workspace}}/build/OpenGL.exe
           ${{github.workspace}}/build/OpenGL
         if-no-files-found: error
-  documentation:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: 'recursive'
-      - uses: mattnotmitt/doxygen-action@v1.9.5
-        with:
-          doxyfile-path: 'docs/Doxygen'
-      # Send build to artifact
-      - name: Upload build
-        uses: actions/upload-artifact@v3
-        with:
-          name: Doxygen Documentation
-          path: ${{github.workspace}}/docs/Doxygen/
-          if-no-files-found: error
-
-
 
 # Cancel release for now
 #    # Sending build to release
@@ -130,3 +112,21 @@ jobs:
 #          **/OpenGL.exe
 #          build/OpenGL
 #          README.md
+
+## Doxygen Documentation is for a later time.
+#  documentation:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v3
+#        with:
+#          submodules: 'recursive'
+#      - uses: mattnotmitt/doxygen-action@v1.9.5
+#        with:
+#          doxyfile-path: 'docs/Doxygen'
+#      # Send build to artifact
+#      - name: Upload build
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: Doxygen Documentation
+#          path: ${{github.workspace}}/docs/Doxygen/
+#          if-no-files-found: error
