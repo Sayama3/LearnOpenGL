@@ -132,7 +132,10 @@ int main() {
         shaderProgram.Bind();
         vao.Bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        float timeValue = glfwGetTime();
+        float greenValue = (glm::sin(timeValue) * 0.5f) + 0.5f;
         shaderProgram2.Bind();
+        shaderProgram2.SetUniform<glm::vec4>("uniformColor", {0, greenValue, 0, 1});
         vao2.Bind();
         glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
