@@ -9,4 +9,5 @@ target_sources(OpenGL PRIVATE
         VertexBufferLayout.cpp
         Shader.cpp
         ShaderProgram.cpp
+        Texture2D.cpp
         )

@@ -9,7 +9,7 @@
 #include "Indices.hpp"
 #include "VertexArrayObject.hpp"
 #include "ShaderProgram.hpp"
-#include "TextureEnums.hpp"
+#include "Texture2D.hpp"
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -64,28 +64,8 @@ int main() {
             1, 2, 3 // second triangle
     };
 
-    // Texture:
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(TextureType::TEXTURE_2D, texture);
-    // set the texture wrapping/filtering options (on currently bound texture)
-    glTexParameteri(TextureType::TEXTURE_2D, TextureParameterName::TEXTURE_WRAP_S, TextureWrapping::REPEAT);
-    glTexParameteri(TextureType::TEXTURE_2D, TextureParameterName::TEXTURE_WRAP_T, TextureWrapping::REPEAT);
-    glTexParameteri(TextureType::TEXTURE_2D, TextureParameterName::TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(TextureType::TEXTURE_2D, TextureParameterName::TEXTURE_MAG_FILTER, GL_LINEAR);
-    int width, height, nrChannels;
-    unsigned char *data = stbi_load("resources/textures/container.jpg", &width, &height,&nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(TextureType::TEXTURE_2D, 0, TextureFormat::RGB, width, height, 0, TextureFormat::RGB,GLType::UNSIGNED_BYTE, data);
-        glGenerateMipmap(TextureType::TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture\"" << "resources/textures/container.jpg" << "\"." << std::endl;
-    }
-    stbi_image_free(data);
-    glBindTexture(TextureType::TEXTURE_2D, 0);
+    Texture2D texture("resources/textures/container.jpg");
+    texture.Unbind();
 
     // The Vertex Buffer Object.
     // 2.1 copy our verticesArray1 array in a buffer for OpenGL to use
@@ -164,8 +144,7 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         // 4. draw the object
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(TextureType::TEXTURE_2D, texture);
+        texture.Bind();
         shaderProgram.Bind();
         vao.Bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
