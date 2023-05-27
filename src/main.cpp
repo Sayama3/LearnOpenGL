@@ -1,12 +1,15 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 #include <string>
 #include "SystemHelper.hpp"
 #include "Vertices.hpp"
 #include "Indices.hpp"
 #include "VertexArrayObject.hpp"
 #include "ShaderProgram.hpp"
+#include "TextureEnums.hpp"
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -42,24 +45,47 @@ int main() {
     // === Shaders ===
     ShaderProgram shaderProgram(ShaderConstructor("resources/shaders/shader.vert", ShaderType::VERTEX_SHADER),
                                  ShaderConstructor("resources/shaders/shader.frag", ShaderType::FRAGMENT_SHADER));
-
+    shaderProgram.Bind();
     // 1. bind Vertex Array Object
     VertexArrayObject vao;
     vao.Bind();
 
     // My First Triangle
-    // TODO: change this for an array of triangles, that are an alias for 3 verticesArray1, which are in turn 3 floats.
-    //  Just me thinking it would be better, not especially true though.
+    // TODO: Change the way we make meshes as this is REALLY unreadable and I make silly mistake when creating a simple square.
     float verticesArray1[] = {
-            -0.25f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // top right
-            -0.25f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
-            -0.75f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom left
-            -0.75f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, // top left
+            // Position(3)     // Color(3)       // TexCoord(2)
+            -0.25f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
+            -0.25f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
+            -0.75f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
+            -0.75f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, // top left
     };
     unsigned int indicesArray1[] = { // note that we start from 0!
             0, 1, 3, // first triangle
             1, 2, 3 // second triangle
     };
+
+    // Texture:
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(TextureType::TEXTURE_2D, texture);
+    // set the texture wrapping/filtering options (on currently bound texture)
+    glTexParameteri(TextureType::TEXTURE_2D, TextureParameterName::TEXTURE_WRAP_S, TextureWrapping::REPEAT);
+    glTexParameteri(TextureType::TEXTURE_2D, TextureParameterName::TEXTURE_WRAP_T, TextureWrapping::REPEAT);
+    glTexParameteri(TextureType::TEXTURE_2D, TextureParameterName::TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(TextureType::TEXTURE_2D, TextureParameterName::TEXTURE_MAG_FILTER, GL_LINEAR);
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("resources/textures/container.jpg", &width, &height,&nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(TextureType::TEXTURE_2D, 0, TextureFormat::RGB, width, height, 0, TextureFormat::RGB,GLType::UNSIGNED_BYTE, data);
+        glGenerateMipmap(TextureType::TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture\"" << "resources/textures/container.jpg" << "\"." << std::endl;
+    }
+    stbi_image_free(data);
+    glBindTexture(TextureType::TEXTURE_2D, 0);
 
     // The Vertex Buffer Object.
     // 2.1 copy our verticesArray1 array in a buffer for OpenGL to use
@@ -75,6 +101,7 @@ int main() {
     VertexBufferLayout layout;
     layout.Push<float>(3);
     layout.Push<float>(3);
+    layout.Push<float>(2);
     vao.AddVertex(vertices, layout);
 
     // You can unbind the VAO afterward so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
@@ -82,17 +109,19 @@ int main() {
     vao.Unbind();
     vertices.Unbind();
     indices.Unbind();
+    shaderProgram.Unbind();
 
     float verticesArray2[] = {
-             // positions                    // colors
-            0.75f, 0.75f, 0.0f, 1.0f, 0.0f, 0.0f, // top right 1 (0)
-            0.75f, 0.25f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right 1 (1)
-            0.25f, 0.25f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom left 1 (2)
-            0.25f, 0.75f, 0.0f, 1.0f, 1.0f, 0.0f, // top left 1 (3)
-            0.75f, -0.25f, 0.0f, 1.0f, 0.0f, 1.0f, // top right 2 (4)
-            0.75f, -0.75f, 0.0f, 0.0f, 1.0f, 1.0f, // bottom right 2 (5)
-            0.25f, -0.75f, 0.0f, 1.0f, 1.0f, 1.0f, // bottom left 2 (6)
-            0.25f, -0.25f, 0.0f, 0.0f, 0.0f, 0.0f, // top left 2 (7)
+            // Position(3)     // Color(3)       // TexCoord(2)
+            0.75f, 0.75f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right 1 (0)
+            0.75f, 0.25f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.5f, // bottom right 1 (1)
+            0.25f, 0.25f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, // bottom left 1 (2)
+            0.25f, 0.75f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, // top left 1 (3)
+
+            0.75f, -0.25f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.5f, // top right 2 (4)
+            0.75f, -0.75f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, // bottom right 2 (5)
+            0.25f, -0.75f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // bottom left 2 (6)
+            0.25f, -0.25f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, // top left 2 (7)
     };
     unsigned int indicesArray2[] = { // note that we start from 0!
             0, 1, 3, // first triangle
@@ -102,6 +131,7 @@ int main() {
     };
     ShaderProgram shaderProgram2(ShaderConstructor("resources/shaders/shader.vert", ShaderType::VERTEX_SHADER),
                                  ShaderConstructor("resources/shaders/shader2.frag", ShaderType::FRAGMENT_SHADER));
+    shaderProgram2.Bind();
     VertexArrayObject vao2;
     vao2.Bind();
 
@@ -114,12 +144,14 @@ int main() {
     VertexBufferLayout layout2;
     layout2.Push<float>(3);
     layout2.Push<float>(3);
+    layout2.Push<float>(2);
 
     vao2.AddVertex(vertices2, layout2);
 
     vao2.Unbind();
     vertices2.Unbind();
     indices2.Unbind();
+    shaderProgram2.Unbind();
 
 
     // Rendering
@@ -132,9 +164,12 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         // 4. draw the object
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(TextureType::TEXTURE_2D, texture);
         shaderProgram.Bind();
         vao.Bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
         float timeValue = glfwGetTime();
         float greenValue = (glm::sin(timeValue) * 0.5f) + 0.5f;
         shaderProgram2.Bind();
