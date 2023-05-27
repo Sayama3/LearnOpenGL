@@ -5,6 +5,7 @@
 #include "Shader.hpp"
 #include "SystemHelper.hpp"
 #include <iostream>
+#include <utility>
 Shader::Shader(const std::string &shaderPath, ShaderType shaderType) : m_ShaderType(shaderType), m_ShaderId(glCreateShader(m_ShaderType)) {
     std::string vertexShaderSource = SystemHelper::ReadFile(shaderPath);
     const char *cstr = vertexShaderSource.c_str();
@@ -29,4 +30,12 @@ bool Shader::CheckCompilation() const {
         std::cerr << "ERROR::SHADER::"<< ShaderTypeToString(m_ShaderType)<<"::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
     return success;
+}
+
+ShaderConstructor::ShaderConstructor(std::string path, ShaderType type) : shaderPath(std::move(path)), shaderType(type) {
+
+}
+
+Shader ShaderConstructor::CreateShader() const {
+    return {shaderPath, shaderType};
 }

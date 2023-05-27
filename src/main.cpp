@@ -40,8 +40,8 @@ int main() {
 
 
     // === Shaders ===
-    ShaderProgram shaderProgram("resources/shaders/shader.vert", ShaderType::VERTEX_SHADER,
-                                "resources/shaders/shader.frag", ShaderType::FRAGMENT_SHADER);
+    ShaderProgram shaderProgram(ShaderConstructor("resources/shaders/shader.vert", ShaderType::VERTEX_SHADER),
+                                 ShaderConstructor("resources/shaders/shader.frag", ShaderType::FRAGMENT_SHADER));
 
     // 1. bind Vertex Array Object
     VertexArrayObject vao;
@@ -98,8 +98,8 @@ int main() {
             4, 5, 7, // third triangle
             5, 6, 7, // fourth triangle
     };
-    ShaderProgram shaderProgram2("resources/shaders/shader.vert", ShaderType::VERTEX_SHADER,
-                                "resources/shaders/shader2.frag", ShaderType::FRAGMENT_SHADER);
+    ShaderProgram shaderProgram2(ShaderConstructor("resources/shaders/shader.vert", ShaderType::VERTEX_SHADER),
+                                 ShaderConstructor("resources/shaders/shader2.frag", ShaderType::FRAGMENT_SHADER));
     VertexArrayObject vao2;
     vao2.Bind();
 

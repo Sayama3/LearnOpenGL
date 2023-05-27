@@ -17,8 +17,14 @@ public:
     ~Shader();
 
     bool CheckCompilation() const;
-
     unsigned int GetId() const;
+};
+
+struct ShaderConstructor{
+    ShaderConstructor(std::string path, ShaderType type);
+    const std::string shaderPath;
+    const ShaderType shaderType;
+    Shader CreateShader() const;
 };
 
 

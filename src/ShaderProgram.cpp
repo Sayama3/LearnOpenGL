@@ -4,60 +4,85 @@
 
 #include "ShaderProgram.hpp"
 
-ShaderProgram::ShaderProgram(const std::string& shaderPath1, ShaderType typeShader1) : m_ShaderProgramId(glCreateProgram()) {
-    Shader shader1(shaderPath1, typeShader1);
-    shader1.CheckCompilation();
-
-    glAttachShader(m_ShaderProgramId, shader1.GetId());
-    glLinkProgram(m_ShaderProgramId);
-}
-
-ShaderProgram::ShaderProgram(const std::string& shaderPath1, ShaderType typeShader1, const std::string& shaderPath2, ShaderType typeShader2) : m_ShaderProgramId(glCreateProgram()) {
-    Shader shader1(shaderPath1, typeShader1);
-    shader1.CheckCompilation();
-    Shader shader2(shaderPath2, typeShader2);
-    shader2.CheckCompilation();
-
-    glAttachShader(m_ShaderProgramId, shader1.GetId());
-    glAttachShader(m_ShaderProgramId, shader2.GetId());
-    glLinkProgram(m_ShaderProgramId);
-}
-
-ShaderProgram::ShaderProgram(const std::string& shaderPath1, ShaderType typeShader1, const std::string& shaderPath2, ShaderType typeShader2, const std::string& shaderPath3, ShaderType typeShader3) : m_ShaderProgramId(glCreateProgram()) {
-    Shader shader1(shaderPath1, typeShader1);
-    shader1.CheckCompilation();
-    Shader shader2(shaderPath2, typeShader2);
-    shader2.CheckCompilation();
-    Shader shader3(shaderPath3, typeShader3);
-    shader3.CheckCompilation();
-
-    glAttachShader(m_ShaderProgramId, shader1.GetId());
-    glAttachShader(m_ShaderProgramId, shader2.GetId());
-    glAttachShader(m_ShaderProgramId, shader3.GetId());
-    glLinkProgram(m_ShaderProgramId);
-}
-
 ShaderProgram::ShaderProgram(const Shader &shader1) : m_ShaderProgramId(glCreateProgram())  {
-    glAttachShader(m_ShaderProgramId, shader1.GetId());
-    glLinkProgram(m_ShaderProgramId);
+    AttachShader(shader1);
+
+    Link();
 }
 
 ShaderProgram::ShaderProgram(const Shader &shader1, const Shader &shader2) : m_ShaderProgramId(glCreateProgram())  {
-    glAttachShader(m_ShaderProgramId, shader1.GetId());
-    glAttachShader(m_ShaderProgramId, shader2.GetId());
-    glLinkProgram(m_ShaderProgramId);
+    AttachShader(shader1);
+    AttachShader(shader2);
+
+    Link();
 }
 
 ShaderProgram::ShaderProgram(const Shader &shader1, const Shader &shader2, const Shader &shader3) : m_ShaderProgramId(glCreateProgram())  {
-    glAttachShader(m_ShaderProgramId, shader1.GetId());
-    glAttachShader(m_ShaderProgramId, shader2.GetId());
-    glAttachShader(m_ShaderProgramId, shader3.GetId());
-    glLinkProgram(m_ShaderProgramId);
+    AttachShader(shader1);
+    AttachShader(shader2);
+    AttachShader(shader3);
+
+    Link();
+}
+
+ShaderProgram::ShaderProgram(const std::vector<ShaderConstructor> &shaders) : m_ShaderProgramId(glCreateProgram()) {
+    auto shadersCount = shaders.size();
+    std::vector<Shader> instances;
+    instances.reserve(shadersCount);
+    for (int i = 0; i < shadersCount; ++i) {
+        instances.push_back(shaders[i].CreateShader());
+        instances[i].CheckCompilation();
+        AttachShader(instances[i]);
+    }
+    Link();
+}
+
+ShaderProgram::ShaderProgram(const std::vector<Shader> &shaders) : m_ShaderProgramId(glCreateProgram())  {
+    for (const auto& shader: shaders) {
+        shader.CheckCompilation();
+        AttachShader(shader);
+    }
+    Link();
+}
+
+ShaderProgram::ShaderProgram(ShaderConstructor shader1) : m_ShaderProgramId(glCreateProgram()) {
+    auto instance1 = shader1.CreateShader();
+    instance1.CheckCompilation();
+    AttachShader(instance1);
+
+    Link();
+}
+
+ShaderProgram::ShaderProgram(ShaderConstructor shader1, ShaderConstructor shader2) : m_ShaderProgramId(glCreateProgram()) {
+    auto instance1 = shader1.CreateShader();
+    instance1.CheckCompilation();
+    AttachShader(instance1);
+
+    auto instance2 = shader2.CreateShader();
+    instance2.CheckCompilation();
+    AttachShader(instance2);
+
+    Link();
+}
+
+ShaderProgram::ShaderProgram(ShaderConstructor shader1, ShaderConstructor shader2, ShaderConstructor shader3) : m_ShaderProgramId(glCreateProgram()) {
+    auto instance1 = shader1.CreateShader();
+    instance1.CheckCompilation();
+    AttachShader(instance1);
+
+    auto instance2 = shader2.CreateShader();
+    instance2.CheckCompilation();
+    AttachShader(instance2);
+
+    auto instance3 = shader3.CreateShader();
+    instance3.CheckCompilation();
+    AttachShader(instance3);
+
+    Link();
 }
 
 ShaderProgram::~ShaderProgram() {
     glDeleteProgram(m_ShaderProgramId);
-
 }
 
 void ShaderProgram::Bind() const {
@@ -68,6 +93,20 @@ void ShaderProgram::Unbind() const {
     glUseProgram(0);
 }
 
-const unsigned int ShaderProgram::GetId() const {
+unsigned int ShaderProgram::GetId() const {
     return m_ShaderProgramId;
 }
+
+void ShaderProgram::AttachShader(unsigned int shaderId) {
+    glAttachShader(m_ShaderProgramId, shaderId);
+}
+
+void ShaderProgram::AttachShader(const Shader &shader) {
+    glAttachShader(m_ShaderProgramId, shader.GetId());
+}
+
+
+void ShaderProgram::Link() {
+    glLinkProgram(m_ShaderProgramId);
+}
+
