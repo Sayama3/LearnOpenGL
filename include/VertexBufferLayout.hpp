@@ -8,16 +8,17 @@
 #include <vector>
 #include <stdexcept>
 #include "glad/glad.h"
+#include "OpenGLType.hpp"
 
 
 struct VertexBufferElement {
-    unsigned int type;
-    unsigned int count;
-    unsigned char normalized;
+    GLType type;
+    int count;
+    bool normalized;
 
     inline unsigned int GetSizeOfType() const { return GetSizeOfType(type); }
 
-    static unsigned int GetSizeOfType(unsigned int type);
+    static unsigned int GetSizeOfType(enum GLType type);
 };
 
 class VertexBufferLayout {
@@ -28,7 +29,7 @@ public:
     VertexBufferLayout();
 
     template<typename T>
-    inline void Push(unsigned int count) {
+    inline void Push(int count) {
         throw std::runtime_error("Type not implemented.");
     }
 
@@ -38,19 +39,19 @@ public:
 };
 
 template<>
-void VertexBufferLayout::Push<float>(unsigned int count);
+void VertexBufferLayout::Push<float>(int count);
 
 template<>
-void VertexBufferLayout::Push<unsigned int>(unsigned int count);
+void VertexBufferLayout::Push<unsigned int>(int count);
 
 template<>
-void VertexBufferLayout::Push<int>(unsigned int count);
+void VertexBufferLayout::Push<int>(int count);
 
 template<>
-void VertexBufferLayout::Push<unsigned char>(unsigned int count);
+void VertexBufferLayout::Push<unsigned char>(int count);
 
 template<>
-void VertexBufferLayout::Push<char>(unsigned int count);
+void VertexBufferLayout::Push<char>(int count);
 
 
 

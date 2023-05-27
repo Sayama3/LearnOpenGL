@@ -121,33 +121,55 @@ int ShaderProgram::GetUniformLocation(const std::string &name) {
 }
 template<>
 void ShaderProgram::SetUniform(const std::string &name, const float& value) {
+    // TODO: See if I should bind the ShaderProgram before setting the uniform. Seems fair to me.
+    Bind();
     glUniform1f(GetUniformLocation(name), value);
 }
 template<>
 void ShaderProgram::SetUniform(const std::string &name, const glm::vec2& value) {
+    // TODO: See if I should bind the ShaderProgram before setting the uniform. Seems fair to me.
+    Bind();
     glUniform2f(GetUniformLocation(name), value.x, value.y);
 }
 template<>
 void ShaderProgram::SetUniform(const std::string &name, const glm::vec3& value) {
+    // TODO: See if I should bind the ShaderProgram before setting the uniform. Seems fair to me.
+    Bind();
     glUniform3f(GetUniformLocation(name), value.x, value.y, value.z);
 }
 template<>
 void ShaderProgram::SetUniform(const std::string &name, const glm::vec4& value) {
+    // TODO: See if I should bind the ShaderProgram before setting the uniform. Seems fair to me.
+    Bind();
     glUniform4f(GetUniformLocation(name), value.x, value.y, value.z, value.w);
 }
 template<>
+void ShaderProgram::SetUniform(const std::string &name, const unsigned int& value) {
+    // TODO: See if I should bind the ShaderProgram before setting the uniform. Seems fair to me.
+    Bind();
+    glUniform1ui(GetUniformLocation(name), value);
+}
+template<>
 void ShaderProgram::SetUniform(const std::string &name, const int& value) {
+    // TODO: See if I should bind the ShaderProgram before setting the uniform. Seems fair to me.
+    Bind();
     glUniform1i(GetUniformLocation(name), value);
 }
 template<>
 void ShaderProgram::SetUniform(const std::string &name, const glm::ivec2& value) {
+    // TODO: See if I should bind the ShaderProgram before setting the uniform. Seems fair to me.
+    Bind();
     glUniform2i(GetUniformLocation(name), value.x, value.y);
 }
 template<>
 void ShaderProgram::SetUniform(const std::string &name, const glm::ivec3& value) {
+    // TODO: See if I should bind the ShaderProgram before setting the uniform. Seems fair to me.
+    Bind();
     glUniform3i(GetUniformLocation(name), value.x, value.y, value.z);
 }
 template<>
 void ShaderProgram::SetUniform(const std::string &name, const glm::ivec4& value) {
+    // TODO: See if I should bind the ShaderProgram before setting the uniform. Seems fair to me.
+    Bind();
     glUniform4i(GetUniformLocation(name), value.x, value.y, value.z, value.w);
 }

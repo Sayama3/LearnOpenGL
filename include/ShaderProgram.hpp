@@ -47,6 +47,8 @@ public:
 template<>
 void ShaderProgram::SetUniform(const std::string & name, const int& value);
 template<>
+void ShaderProgram::SetUniform(const std::string & name, const unsigned int& value);
+template<>
 void ShaderProgram::SetUniform(const std::string & name, const glm::vec2& value);
 template<>
 void ShaderProgram::SetUniform(const std::string & name, const glm::vec3& value);

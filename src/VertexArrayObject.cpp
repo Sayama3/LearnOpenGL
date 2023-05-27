@@ -29,7 +29,7 @@ void VertexArrayObject::AddVertex(const Vertices & vertices, const VertexBufferL
     unsigned int offset = 0;
     for (int i = 0; i < elements.size(); ++i) {
         auto &element = elements[i];
-        glVertexAttribPointer(i, static_cast<int>(element.count), element.type, element.normalized, static_cast<GLsizei>(layout.GetStride()), (const void *) offset);
+        glVertexAttribPointer(i, element.count, element.type, element.normalized, static_cast<GLsizei>(layout.GetStride()), (const void *) offset);
         glEnableVertexAttribArray(i);
         offset += element.count * element.GetSizeOfType();
     }

@@ -51,10 +51,10 @@ int main() {
     // TODO: change this for an array of triangles, that are an alias for 3 verticesArray1, which are in turn 3 floats.
     //  Just me thinking it would be better, not especially true though.
     float verticesArray1[] = {
-            -0.25f, 0.5f, 0.0f, // top right
-            -0.25f, -0.5f, 0.0f, // bottom right
-            -0.75f, -0.5f, 0.0f, // bottom left
-            -0.75f, 0.5f, 0.0f, // top left
+            -0.25f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // top right
+            -0.25f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
+            -0.75f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom left
+            -0.75f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, // top left
     };
     unsigned int indicesArray1[] = { // note that we start from 0!
             0, 1, 3, // first triangle
@@ -74,6 +74,7 @@ int main() {
     // 3. then set the vertex attributes pointers
     VertexBufferLayout layout;
     layout.Push<float>(3);
+    layout.Push<float>(3);
     vao.AddVertex(vertices, layout);
 
     // You can unbind the VAO afterward so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
@@ -83,14 +84,15 @@ int main() {
     indices.Unbind();
 
     float verticesArray2[] = {
-            0.75f, 0.75f, 0.0f, // top right 1 (0)
-            0.75f, 0.25f, 0.0f, // bottom right 1 (1)
-            0.25f, 0.25f, 0.0f, // bottom left 1 (2)
-            0.25f, 0.75f, 0.0f, // top left 1 (3)
-            0.75f, -0.25f, 0.0f, // top right 2 (4)
-            0.75f, -0.75f, 0.0f, // bottom right 2 (5)
-            0.25f, -0.75f, 0.0f, // bottom left 2 (6)
-            0.25f, -0.25f, 0.0f, // top left 2 (7)
+             // positions                    // colors
+            0.75f, 0.75f, 0.0f, 1.0f, 0.0f, 0.0f, // top right 1 (0)
+            0.75f, 0.25f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right 1 (1)
+            0.25f, 0.25f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom left 1 (2)
+            0.25f, 0.75f, 0.0f, 1.0f, 1.0f, 0.0f, // top left 1 (3)
+            0.75f, -0.25f, 0.0f, 1.0f, 0.0f, 1.0f, // top right 2 (4)
+            0.75f, -0.75f, 0.0f, 0.0f, 1.0f, 1.0f, // bottom right 2 (5)
+            0.25f, -0.75f, 0.0f, 1.0f, 1.0f, 1.0f, // bottom left 2 (6)
+            0.25f, -0.25f, 0.0f, 0.0f, 0.0f, 0.0f, // top left 2 (7)
     };
     unsigned int indicesArray2[] = { // note that we start from 0!
             0, 1, 3, // first triangle
@@ -110,6 +112,7 @@ int main() {
     indices2.Bind();
 
     VertexBufferLayout layout2;
+    layout2.Push<float>(3);
     layout2.Push<float>(3);
 
     vao2.AddVertex(vertices2, layout2);
@@ -135,7 +138,7 @@ int main() {
         float timeValue = glfwGetTime();
         float greenValue = (glm::sin(timeValue) * 0.5f) + 0.5f;
         shaderProgram2.Bind();
-        shaderProgram2.SetUniform<glm::vec4>("uniformColor", {0, greenValue, 0, 1});
+        shaderProgram2.SetUniform<glm::vec4>("uniformColor", {0, greenValue, 1-greenValue, 1});
         vao2.Bind();
         glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 

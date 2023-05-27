@@ -5,49 +5,59 @@
 #include "VertexBufferLayout.hpp"
 VertexBufferLayout::VertexBufferLayout() : m_Stride(0) {}
 
-unsigned int VertexBufferElement::GetSizeOfType(unsigned int type) {
+unsigned int VertexBufferElement::GetSizeOfType(enum GLType type) {
     switch (type) {
-        case GL_FLOAT:
-            return sizeof(GLfloat);
-        case GL_UNSIGNED_INT:
-            return sizeof(GLuint);
-        case GL_INT:
-            return sizeof(GLint);
-        case GL_UNSIGNED_BYTE:
-            return sizeof(GLubyte);
-        case GL_BYTE:
+        case BYTE:
             return sizeof(GLbyte);
+        case UNSIGNED_BYTE:
+            return sizeof(GLuint);
+        case SHORT:
+            return sizeof(GLshort);
+        case UNSIGNED_SHORT:
+            return sizeof(GLushort);
+        case INT:
+            return sizeof(GLint);
+        case UNSIGNED_INT:
+            return sizeof(GLuint);
+        case HALF_FLOAT:
+            return sizeof(GLhalf);
+        case FLOAT:
+            return sizeof(GLfloat);
+        case DOUBLE:
+            return sizeof(GLdouble);
+        case FIXED:
+            return sizeof(GLfixed);
         default:
             throw std::runtime_error("Type not implemented.");
     }
 }
 
 template<>
-void VertexBufferLayout::Push<float>(unsigned int count) {
-    m_Elements.push_back({GL_FLOAT, count, GL_FALSE});
-    m_Stride += VertexBufferElement::GetSizeOfType(GL_FLOAT) * count;
+void VertexBufferLayout::Push<float>(int count) {
+    m_Elements.push_back({GLType::FLOAT, count, false});
+    m_Stride += VertexBufferElement::GetSizeOfType(GLType::FLOAT) * count;
 }
 
 template<>
-void VertexBufferLayout::Push<unsigned int>(unsigned int count) {
-    m_Elements.push_back({GL_UNSIGNED_INT, count, GL_FALSE});
-    m_Stride += VertexBufferElement::GetSizeOfType(GL_UNSIGNED_INT) * count;
+void VertexBufferLayout::Push<unsigned int>(int count) {
+    m_Elements.push_back({GLType::UNSIGNED_INT, count, false});
+    m_Stride += VertexBufferElement::GetSizeOfType(GLType::UNSIGNED_INT) * count;
 }
 
 template<>
-void VertexBufferLayout::Push<int>(unsigned int count) {
-    m_Elements.push_back({GL_INT, count, GL_FALSE});
-    m_Stride += VertexBufferElement::GetSizeOfType(GL_INT) * count;
+void VertexBufferLayout::Push<int>(int count) {
+    m_Elements.push_back({GLType::INT, count, false});
+    m_Stride += VertexBufferElement::GetSizeOfType(GLType::INT) * count;
 }
 
 template<>
-void VertexBufferLayout::Push<unsigned char>(unsigned int count) {
-    m_Elements.push_back({GL_UNSIGNED_BYTE, count, GL_TRUE});
-    m_Stride += VertexBufferElement::GetSizeOfType(GL_UNSIGNED_BYTE) * count;
+void VertexBufferLayout::Push<unsigned char>(int count) {
+    m_Elements.push_back({GLType::UNSIGNED_BYTE, count, true});
+    m_Stride += VertexBufferElement::GetSizeOfType(GLType::UNSIGNED_BYTE) * count;
 }
 
 template<>
-void VertexBufferLayout::Push<char>(unsigned int count) {
-    m_Elements.push_back({GL_BYTE, count, GL_TRUE});
-    m_Stride += VertexBufferElement::GetSizeOfType(GL_BYTE) * count;
+void VertexBufferLayout::Push<char>(int count) {
+    m_Elements.push_back({GLType::BYTE, count, true});
+    m_Stride += VertexBufferElement::GetSizeOfType(GLType::BYTE) * count;
 }
