@@ -16,6 +16,7 @@ Texture2D::Texture2D(const std::string &path, enum TextureFormat textureFormat, 
     SetParam(TextureParameterName::TEXTURE_MIN_FILTER, GL_LINEAR);
     SetParam(TextureParameterName::TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    stbi_set_flip_vertically_on_load(true);
     unsigned char *data = stbi_load("resources/textures/container.jpg", &m_Width, &m_Height, &m_NbrChannels, 0);
 
     if (data)
