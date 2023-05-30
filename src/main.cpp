@@ -42,6 +42,7 @@ int main() {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+    glEnable(GL_DEPTH_TEST);
 
 
     // === Shaders ===
@@ -52,8 +53,9 @@ int main() {
     VertexArrayObject vao;
     vao.Bind();
 
-    // My First Triangle
-    // TODO: Change the way we make meshes as this is REALLY unreadable and I make silly mistake when creating a simple square.
+    // TODO: transform the following in a cube.
+    //  We'll see later on how we want to implement the mesh system based on the different experiments and use
+    //  of the mesh I will have.
     float verticesArray1[] = {
             // Position(3)     // Color(3)       // TexCoord(2)
             0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
@@ -61,6 +63,7 @@ int main() {
             -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
             -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, // top left
     };
+
     unsigned int indicesArray1[] = { // note that we start from 0!
             0, 1, 3, // first triangle
             1, 2, 3 // second triangle
@@ -112,7 +115,7 @@ int main() {
 
         //TODO: The rendering/ The renderer
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT););
         // 4. draw the object
         texture.Bind();
         shaderProgram.Bind();
