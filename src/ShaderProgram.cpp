@@ -173,3 +173,10 @@ void ShaderProgram::SetUniform(const std::string &name, const glm::ivec4& value)
     Bind();
     glUniform4i(GetUniformLocation(name), value.x, value.y, value.z, value.w);
 }
+
+template<>
+void ShaderProgram::SetUniform(const std::string &name, const glm::mat4& value) {
+    // TODO: See if I should bind the ShaderProgram before setting the uniform. Seems fair to me.
+    Bind();
+    glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value));
+}

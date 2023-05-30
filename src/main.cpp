@@ -10,6 +10,7 @@
 #include "VertexArrayObject.hpp"
 #include "ShaderProgram.hpp"
 #include "Texture2D.hpp"
+#include "MathHelper.hpp"
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -83,6 +84,12 @@ int main() {
     layout.Push<float>(3);
     layout.Push<float>(2);
     vao.AddVertex(vertices, layout);
+
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::rotate(trans, glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
+    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+
+    shaderProgram.SetUniform<glm::mat4>("transform", trans);
 
     // You can unbind the VAO afterward so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyway, so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.

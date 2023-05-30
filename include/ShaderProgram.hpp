@@ -8,7 +8,9 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <vector>
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include "Shader.hpp"
 
 
@@ -62,5 +64,11 @@ template<>
 void ShaderProgram::SetUniform(const std::string & name, const glm::ivec3& value);
 template<>
 void ShaderProgram::SetUniform(const std::string & name, const glm::ivec4& value);
+template<>
+void ShaderProgram::SetUniform(const std::string & name, const glm::mat4& value);
+template<>
+void ShaderProgram::SetUniform(const std::string & name, const glm::mat3& value);
+template<>
+void ShaderProgram::SetUniform(const std::string & name, const glm::mat2& value);
 
 #endif //LEARNOPENGL_SHADERPROGRAM_HPP
