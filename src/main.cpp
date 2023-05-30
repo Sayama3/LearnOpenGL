@@ -11,7 +11,8 @@
 #include "ShaderProgram.hpp"
 #include "Texture2D.hpp"
 #include "MathHelper.hpp"
-
+float _width = 800;
+float _height = 600;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -26,7 +27,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(_width, _height, "LearnOpenGL", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -55,10 +56,10 @@ int main() {
     // TODO: Change the way we make meshes as this is REALLY unreadable and I make silly mistake when creating a simple square.
     float verticesArray1[] = {
             // Position(3)     // Color(3)       // TexCoord(2)
-            -0.25f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
-            -0.25f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
-            -0.75f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-            -0.75f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, // top left
+            0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
+            0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
+            -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, // top left
     };
     unsigned int indicesArray1[] = { // note that we start from 0!
             0, 1, 3, // first triangle
@@ -92,47 +93,15 @@ int main() {
     indices.Unbind();
     shaderProgram.Unbind();
 
-    float verticesArray2[] = {
-            // Position(3)     // Color(3)       // TexCoord(2)
-            0.75f, 0.75f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right 1 (0)
-            0.75f, 0.25f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.5f, // bottom right 1 (1)
-            0.25f, 0.25f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, // bottom left 1 (2)
-            0.25f, 0.75f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, // top left 1 (3)
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
-            0.75f, -0.25f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.5f, // top right 2 (4)
-            0.75f, -0.75f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, // bottom right 2 (5)
-            0.25f, -0.75f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // bottom left 2 (6)
-            0.25f, -0.25f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, // top left 2 (7)
-    };
-    unsigned int indicesArray2[] = { // note that we start from 0!
-            0, 1, 3, // first triangle
-            1, 2, 3, // second triangle
-            4, 5, 7, // third triangle
-            5, 6, 7, // fourth triangle
-    };
-    ShaderProgram shaderProgram2(ShaderConstructor("resources/shaders/shader.vert", ShaderType::VERTEX_SHADER),
-                                 ShaderConstructor("resources/shaders/shader2.frag", ShaderType::FRAGMENT_SHADER));
-    shaderProgram2.Bind();
-    VertexArrayObject vao2;
-    vao2.Bind();
+    glm::mat4 view = glm::mat4(1.0f);
+    // note that we’re translating the scene in the reverse direction
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 
-    Vertices vertices2(verticesArray2, sizeof(verticesArray2), BufferUsage::STATIC_DRAW);
-    vertices.Bind();
-
-    Indices indices2(indicesArray2, sizeof(indicesArray2) / sizeof(indicesArray2[0]), BufferUsage::STATIC_DRAW);
-    indices2.Bind();
-
-    VertexBufferLayout layout2;
-    layout2.Push<float>(3);
-    layout2.Push<float>(3);
-    layout2.Push<float>(2);
-
-    vao2.AddVertex(vertices2, layout2);
-
-    vao2.Unbind();
-    vertices2.Unbind();
-    indices2.Unbind();
-    shaderProgram2.Unbind();
+    glm::mat4 projection;
+    projection = glm::perspective(glm::radians(45.0f), _width / _height, 0.1f, 100.0f);
 
 
     // Rendering
@@ -148,21 +117,12 @@ int main() {
         texture.Bind();
         shaderProgram.Bind();
 
-        glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-
-        shaderProgram.SetUniform<glm::mat4>("transform", trans);
+        shaderProgram.SetUniform<glm::mat4>("model", model);
+        shaderProgram.SetUniform<glm::mat4>("view", view);
+        shaderProgram.SetUniform<glm::mat4>("projection", projection);
 
         vao.Bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-        float timeValue = glfwGetTime();
-        float greenValue = (glm::sin(timeValue) * 0.5f) + 0.5f;
-        shaderProgram2.Bind();
-        shaderProgram2.SetUniform<glm::vec4>("uniformColor", {0, greenValue, 1-greenValue, 1});
-        vao2.Bind();
-        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
         // check and call events and swap the buffers
         glfwSwapBuffers(window);
@@ -175,6 +135,8 @@ int main() {
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
+    _width = width;
+    _height = height;
     glViewport(0, 0, width, height);
 }
 
