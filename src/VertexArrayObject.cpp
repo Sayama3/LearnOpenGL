@@ -5,8 +5,11 @@
 #include "VertexArrayObject.hpp"
 #include "glad/glad.h"
 
-VertexArrayObject::VertexArrayObject() : m_VertexArrayId(){
+VertexArrayObject::VertexArrayObject(bool shouldBind) : m_VertexArrayId(){
     glGenVertexArrays(1, &this->m_VertexArrayId);
+    if(shouldBind) {
+        Bind();
+    }
 }
 
 VertexArrayObject::~VertexArrayObject() {

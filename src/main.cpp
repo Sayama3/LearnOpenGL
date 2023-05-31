@@ -11,6 +11,7 @@
 #include "ShaderProgram.hpp"
 #include "Texture2D.hpp"
 #include "MathHelper.hpp"
+#include "Cube.hpp"
 float _width = 800;
 float _height = 600;
 
@@ -49,55 +50,15 @@ int main() {
     ShaderProgram shaderProgram(ShaderConstructor("resources/shaders/shader.vert", ShaderType::VERTEX_SHADER),
                                  ShaderConstructor("resources/shaders/shader.frag", ShaderType::FRAGMENT_SHADER));
     shaderProgram.Bind();
-    // 1. bind Vertex Array Object
-    VertexArrayObject vao;
-    vao.Bind();
-
-    // TODO: transform the following in a cube.
-    //  We'll see later on how we want to implement the mesh system based on the different experiments and use
-    //  of the mesh I will have.
-    float verticesArray1[] = {
-            // Position(3)     // Color(3)       // TexCoord(2)
-            0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
-            0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
-            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-            -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, // top left
-    };
-
-    unsigned int indicesArray1[] = { // note that we start from 0!
-            0, 1, 3, // first triangle
-            1, 2, 3 // second triangle
-    };
 
     Texture2D texture("resources/textures/container.jpg");
     texture.Unbind();
 
-    // The Vertex Buffer Object.
-    // 2.1 copy our verticesArray1 array in a buffer for OpenGL to use
-    Vertices vertices(verticesArray1, sizeof(verticesArray1), BufferUsage::STATIC_DRAW);
-    vertices.Bind();
+    Cube cube;
 
-    // The Element Buffer Object (st<ore the indicesArray1 of the verticesArray1)
-    // 2.2 copy our indicesArray1 array in a buffer for OpenGL to use
-    Indices indices(indicesArray1, sizeof(indicesArray1) / sizeof(indicesArray1[0]), BufferUsage::STATIC_DRAW);
-    indices.Bind();
-
-    // 3. then set the vertex attributes pointers
-    VertexBufferLayout layout;
-    layout.Push<float>(3);
-    layout.Push<float>(3);
-    layout.Push<float>(2);
-    vao.AddVertex(vertices, layout);
-
-    // You can unbind the VAO afterward so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyway, so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    vao.Unbind();
-    vertices.Unbind();
-    indices.Unbind();
     shaderProgram.Unbind();
 
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    cube.m_Model = glm::rotate(cube.m_Model, glm::radians(-55.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
     glm::mat4 view = glm::mat4(1.0f);
     // note that we’re translating the scene in the reverse direction
@@ -115,17 +76,16 @@ int main() {
 
         //TODO: The rendering/ The renderer
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT););
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         // 4. draw the object
         texture.Bind();
         shaderProgram.Bind();
 
-        shaderProgram.SetUniform<glm::mat4>("model", model);
+        shaderProgram.SetUniform<glm::mat4>("model", cube.m_Model);
         shaderProgram.SetUniform<glm::mat4>("view", view);
         shaderProgram.SetUniform<glm::mat4>("projection", projection);
 
-        vao.Bind();
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        cube.Draw();
 
         // check and call events and swap the buffers
         glfwSwapBuffers(window);

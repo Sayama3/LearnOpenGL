@@ -12,7 +12,7 @@ class VertexArrayObject {
 private:
     unsigned int m_VertexArrayId;
 public:
-    VertexArrayObject();
+    VertexArrayObject(bool shouldBind = false);
     ~VertexArrayObject();
 
     void Bind() const;

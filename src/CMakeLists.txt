@@ -11,4 +11,5 @@ target_sources(OpenGL PRIVATE
         ShaderProgram.cpp
         Texture2D.cpp
         MathHelper.cpp
+        Cube.cpp
         )
