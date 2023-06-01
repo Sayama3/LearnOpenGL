@@ -20,6 +20,7 @@ float _height = 600;
 bool firstMouse = true;
 float lastX, lastY;
 float yaw = -90.0f, pitch;
+float zoom = 60.0f;
 
 const float cameraSpeed = 5.0f; // adjust accordingly
 glm::vec3 cameraPosition = {0.0f, 0.0f, 3.0f};
@@ -34,6 +35,7 @@ double lastFrame = 0.0;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 int main() {
     glfwInit();
@@ -56,6 +58,7 @@ int main() {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -124,7 +127,7 @@ int main() {
 
         // View & Projection Matrix update.
         view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
-        projection = glm::perspective(glm::radians(60.0f), _width / _height, 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(zoom), _width / _height, 0.1f, 100.0f);
 
         // Updating projection & view matrix.
         shaderProgram.SetUniform<glm::mat4>("view", view);
@@ -233,4 +236,12 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
         glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraFront));
         cameraUp = glm::cross(cameraFront, cameraRight);
     }
+}
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    zoom -= (float)yoffset;
+    if (zoom < 1.0f)
+        zoom = 1.0f;
+    if (zoom > 60.0f)
+        zoom = 60.0f;
 }
