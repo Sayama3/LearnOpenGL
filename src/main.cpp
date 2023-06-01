@@ -18,6 +18,15 @@ float _height = 600;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
+const float cameraSpeed = 5.0f; // adjust accordingly
+glm::vec3 cameraPosition = {0.0f, 0.0f, 3.0f};
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+// Set this in the renderer.
+double currentFrame = 0.0;
+double deltaTime = 0.001667; // Arbitrary 60fps
+double lastFrame = 0.0;
 
 int main() {
     glfwInit();
@@ -75,15 +84,8 @@ int main() {
 
     // === Camera ===
     // The axis is right-handed
-    glm::vec3 cameraPosition = {0.0f, 0.0f, 3.0f};
-    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    // We want to have the direction from the origin to the camera, has to why it's the "reverse" direction.
-    glm::vec3 cameraReverseDirection = glm::normalize(cameraPosition - cameraTarget);
-    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraReverseDirection));
-    glm::vec3 cameraUp = glm::cross(cameraReverseDirection, cameraRight);
     glm::mat4 view = glm::mat4(1.0f);
-    view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+    view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
 
     // === Projection ===
     glm::mat4 projection = glm::identity<glm::mat4>();
@@ -91,6 +93,11 @@ int main() {
     // === Rendering ===
     while(!glfwWindowShouldClose(window))
     {
+        // Frame duration processing.
+        currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         // Input Processing
         processInput(window);
 
@@ -103,11 +110,7 @@ int main() {
         shaderProgram.Bind();
 
         // View & Projection Matrix update.
-        const float radius = 10.0f;
-        float camX = glm::sin(glfwGetTime()) * radius;
-        float camZ = glm::cos(glfwGetTime()) * radius;
-        cameraPosition = glm::vec3(camX, 0, camZ);
-        view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+        view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
         projection = glm::perspective(glm::radians(60.0f), _width / _height, 0.1f, 100.0f);
 
         // Updating projection & view matrix.
@@ -148,5 +151,36 @@ void processInput(GLFWwindow *window)
 {
     // Simple exit with the "escape" button for now.
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
         glfwSetWindowShouldClose(window, true);
+    }
+    glm::vec3 cameraMovement;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    {
+        cameraMovement += cameraFront;
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        cameraMovement -= cameraFront;
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        cameraMovement -= glm::normalize(glm::cross(cameraFront, cameraUp));
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        cameraMovement += glm::normalize(glm::cross(cameraFront, cameraUp));
+    }
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+    {
+        cameraMovement -= cameraUp;
+    }
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+    {
+        cameraMovement += cameraUp;
+    }
+    if(glm::length(cameraMovement) > 1 ){
+        cameraMovement = glm::normalize(cameraMovement);
+    }
+    cameraPosition += cameraSpeed * cameraMovement * static_cast<float>(deltaTime);
 }
