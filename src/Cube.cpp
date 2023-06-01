@@ -12,14 +12,13 @@ VertexBufferLayout Vertex::GetLayout() {
     return layout;
 }
 
-Cube::Cube(float size, glm::mat4 model) :
+Cube::Cube(float size) :
         m_VertexArrayObject(true),
         m_VerticesArray{{{-(size*0.5f), -(size*0.5f), -(size*0.5f)}, {0.0f, 0.0f}}, {{+(size*0.5f), -(size*0.5f), -(size*0.5f)}, {1.0f, 0.0f}}, {{+(size*0.5f), +(size*0.5f), -(size*0.5f)}, {1.0f, 1.0f}}, {{-(size*0.5f), +(size*0.5f), -(size*0.5f)}, {0.0f, 1.0f}}, {{-(size*0.5f), -(size*0.5f), +(size*0.5f)}, {0.0f, 0.0f}}, {{+(size*0.5f), -(size*0.5f), +(size*0.5f)}, {1.0f, 0.0f}}, {{+(size*0.5f), +(size*0.5f), +(size*0.5f)}, {1.0f, 1.0f}}, {{-(size*0.5f), +(size*0.5f), +(size*0.5f)}, {0.0f, 1.0f}}, {{-(size*0.5f), +(size*0.5f), +(size*0.5f)}, {1.0f, 0.0f}}, {{-(size*0.5f), +(size*0.5f), -(size*0.5f)}, {1.0f, 1.0f}}, {{-(size*0.5f), -(size*0.5f), -(size*0.5f)}, {0.0f, 1.0f}}, {{+(size*0.5f), +(size*0.5f), +(size*0.5f)}, {1.0f, 0.0f}}, {{+(size*0.5f), -(size*0.5f), -(size*0.5f)}, {0.0f, 1.0f}}, {{+(size*0.5f), -(size*0.5f), +(size*0.5f)}, {0.0f, 0.0f}}, {{+(size*0.5f), -(size*0.5f), -(size*0.5f)}, {1.0f, 1.0f}}, {{-(size*0.5f), +(size*0.5f), +(size*0.5f)}, {0.0f, 0.0f}}},
         m_IndicesArray{0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4, 8, 9, 10, 10, 4, 8, 11, 2, 12, 12, 13, 11, 10, 14, 5, 5, 4, 10, 3, 2, 11, 11, 15, 3},
         m_Layout(Vertex::GetLayout()),
         m_Vertices((void*)m_VerticesArray, 16 * m_Layout.GetStride(), BufferUsage::STATIC_DRAW),
-        m_Indices(m_IndicesArray, 36, BufferUsage::STATIC_DRAW),
-        m_Model(model)
+        m_Indices(m_IndicesArray, 36, BufferUsage::STATIC_DRAW)
 {
     m_VertexArrayObject.Bind();
     m_Vertices.Bind();

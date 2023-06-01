@@ -32,8 +32,7 @@ private:
 
 
 public:
-    glm::mat4 m_Model;
-    explicit Cube(float size = 1.0f, glm::mat4 model = glm::identity<glm::mat4>());
+    explicit Cube(float size = 1.0f);
     void Bind() const;
     void Unbind() const;
     void Draw() const;
