@@ -1,9 +1,10 @@
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 #include <string>
+#include <glm/gtx/string_cast.hpp>
 #include "SystemHelper.hpp"
 #include "Vertices.hpp"
 #include "Indices.hpp"
@@ -12,11 +13,13 @@
 #include "Texture2D.hpp"
 #include "MathHelper.hpp"
 #include "Cube.hpp"
+
 float _width = 800;
 float _height = 600;
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow *window);
+bool firstMouse = true;
+float lastX, lastY;
+float yaw = -90.0f, pitch;
 
 const float cameraSpeed = 5.0f; // adjust accordingly
 glm::vec3 cameraPosition = {0.0f, 0.0f, 3.0f};
@@ -28,11 +31,16 @@ double currentFrame = 0.0;
 double deltaTime = 0.001667; // Arbitrary 60fps
 double lastFrame = 0.0;
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void processInput(GLFWwindow *window);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+
 int main() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
@@ -45,7 +53,9 @@ int main() {
         return -1;
     }
     glfwMakeContextCurrent(window);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -53,6 +63,7 @@ int main() {
         return -1;
     }
     glEnable(GL_DEPTH_TEST);
+
 
 
     // === Shaders ===
@@ -108,6 +119,8 @@ int main() {
         // Texture Update
         texture.Bind();
         shaderProgram.Bind();
+        std::cout << "position  : " << glm::to_string(cameraPosition) << " | ";
+        std::cout << "direction : " << glm::to_string(cameraFront) << '\r';
 
         // View & Projection Matrix update.
         view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
@@ -142,8 +155,8 @@ int main() {
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    _width = width;
-    _height = height;
+    _width = static_cast<float>(width);
+    _height = static_cast<float>(height);
     glViewport(0, 0, width, height);
 }
 
@@ -154,33 +167,70 @@ void processInput(GLFWwindow *window)
     {
         glfwSetWindowShouldClose(window, true);
     }
-    glm::vec3 cameraMovement;
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    // Keyboard movement
     {
-        cameraMovement += cameraFront;
+        auto cameraMovement = glm::vec3(0);
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+            cameraMovement += cameraFront;
+        }
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            cameraMovement -= cameraFront;
+        }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            cameraMovement -= glm::normalize(glm::cross(cameraFront, cameraUp));
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            cameraMovement += glm::normalize(glm::cross(cameraFront, cameraUp));
+        }
+        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+            cameraMovement -= cameraUp;
+        }
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+            cameraMovement += cameraUp;
+        }
+//        std::cout << glm::to_string(cameraMovement) << std::endl;
+
+        cameraPosition += cameraSpeed * cameraMovement * static_cast<float>(deltaTime);
     }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+    if (firstMouse) // initially set to true
     {
-        cameraMovement -= cameraFront;
+        lastX = static_cast<float>(xpos);
+        lastY = static_cast<float>(ypos);
+        firstMouse = false;
     }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    float xoffset = static_cast<float>(xpos) - lastX;
+    float yoffset = lastY - static_cast<float>(ypos); // reversed: y ranges bottom to top
+    lastX = static_cast<float>(xpos);
+    lastY = static_cast<float>(ypos);
+
+    const float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    // SafeGuard for euler angles
+    if(pitch > 89.0f)
     {
-        cameraMovement -= glm::normalize(glm::cross(cameraFront, cameraUp));
+        pitch = 89.0f;
     }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    if(pitch < -89.0f)
     {
-        cameraMovement += glm::normalize(glm::cross(cameraFront, cameraUp));
+        pitch = -89.0f;
     }
-    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+
+    glm::vec3 cameraDirection;
+    cameraDirection.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraDirection.y = sin(glm::radians(pitch));
+    cameraDirection.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = cameraDirection;
     {
-        cameraMovement -= cameraUp;
+        glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+        glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraFront));
+        cameraUp = glm::cross(cameraFront, cameraRight);
     }
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-    {
-        cameraMovement += cameraUp;
-    }
-    if(glm::length(cameraMovement) > 1 ){
-        cameraMovement = glm::normalize(cameraMovement);
-    }
-    cameraPosition += cameraSpeed * cameraMovement * static_cast<float>(deltaTime);
 }
