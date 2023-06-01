@@ -9,7 +9,7 @@
 
 enum BufferType {
     /**
-    * Vertex attributes
+    * CubeVertex attributes
     */
     ARRAY_BUFFER = GL_ARRAY_BUFFER,
     /**
@@ -33,7 +33,7 @@ enum BufferType {
     */
     DRAW_INDIRECT_BUFFER = GL_DRAW_INDIRECT_BUFFER,
     /**
-    * Vertex array indices
+    * CubeVertex array indices
     */
     ELEMENT_ARRAY_BUFFER = GL_ELEMENT_ARRAY_BUFFER,
     /**

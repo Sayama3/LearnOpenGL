@@ -15,6 +15,7 @@
 #include "Cube.hpp"
 #include "Camera.hpp"
 #include "GLFWType.hpp"
+#include "LightSource.hpp"
 
 float _width = 800;
 float _height = 600;
@@ -64,10 +65,20 @@ int main() {
     }
     glEnable(GL_DEPTH_TEST);
 
+    // === Light ===
+    LightSource lightSource;
+    ShaderProgram lightSourceShader(ShaderConstructor("resources/shaders/lightsource.vert", ShaderType::VERTEX_SHADER),
+                             ShaderConstructor("resources/shaders/lightsource.frag", ShaderType::FRAGMENT_SHADER));
+    lightSourceShader.Bind();
+    glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+
+
     // === Shaders ===
-    ShaderProgram shaderProgram(ShaderConstructor("resources/shaders/shader.vert", ShaderType::VERTEX_SHADER),
-                                 ShaderConstructor("resources/shaders/shader.frag", ShaderType::FRAGMENT_SHADER));
-    shaderProgram.Bind();
+    ShaderProgram cubeShader(ShaderConstructor("resources/shaders/container.vert", ShaderType::VERTEX_SHADER),
+                             ShaderConstructor("resources/shaders/container.frag", ShaderType::FRAGMENT_SHADER));
+    cubeShader.Bind();
+    cubeShader.SetUniform<glm::vec3>("objectColor", {1.0f, 0.5f, 0.31f});
+    cubeShader.SetUniform<glm::vec3>("lightColor", {1.0f, 1.0f, 1.0f});
 
     Texture2D texture("resources/textures/container.jpg");
     texture.Unbind();
@@ -75,7 +86,7 @@ int main() {
     // === Models ===
     Cube cube;
 
-    shaderProgram.Unbind();
+    cubeShader.Unbind();
 
     glm::vec3 cubePositions[] = {
     glm::vec3( 0.0f, 0.0f, 0.0f),
@@ -87,7 +98,7 @@ int main() {
     glm::vec3( 1.3f, -2.0f, -2.5f),
     glm::vec3( 1.5f, 2.0f, -2.5f),
     glm::vec3( 1.5f, 0.2f, -1.5f),
-    glm::vec3(-1.3f, 1.0f, -1.5f)
+    glm::vec3(-1.3f, 1.0f, -1.5f),
     };
     float rotationSpeed = 5.0f;
 
@@ -106,26 +117,45 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Texture Update
-        texture.Bind();
-        shaderProgram.Bind();
-
-        // Updating projection & view matrix.
-        shaderProgram.SetUniform<glm::mat4>("view", camera.GetViewMatrix());
-        shaderProgram.SetUniform<glm::mat4>("projection", camera.GetProjectionMatrix());
+        // Rendering LightSource
+        {
+            lightSourceShader.Bind();
+            auto model = glm::mat4(1.0f);
+            model = glm::translate(model, lightPos);
+            model = glm::scale(model, glm::vec3(0.2f));
+            lightSourceShader.SetUniform<glm::mat4>("model", model);
+            lightSourceShader.SetUniform<glm::mat4>("view", camera.GetViewMatrix());
+            lightSourceShader.SetUniform<glm::mat4>("projection", camera.GetProjectionMatrix());
+            lightSource.Bind();
+            lightSource.Draw();
+            lightSourceShader.Unbind();
+        }
 
         // Rendering meshes.
-        for(unsigned int i = 0; i < 10; i++) {
-            auto& pos = cubePositions[i];
-            glm::mat4 model = glm::identity<glm::mat4>();
-            model = glm::translate(model, pos);
-            float angle = 20.0f * i;
-            if(i%3 == 0){
-                angle += static_cast<float>(glfwGetTime()) * rotationSpeed * (i%6 ? -1.0f : 1.0f);
+        {
+            // Texture Update
+            texture.Bind();
+            cubeShader.Bind();
+
+            // Updating projection & view matrix.
+            cubeShader.SetUniform<glm::mat4>("view", camera.GetViewMatrix());
+            cubeShader.SetUniform<glm::mat4>("projection", camera.GetProjectionMatrix());
+            cubeShader.SetUniform<glm::vec3>("lightPos", lightPos);
+            cubeShader.SetUniform<glm::vec3>("viewPos", camera.GetPosition());
+            for (unsigned int i = 0; i < sizeof(cubePositions) / sizeof(cubePositions[0]); i++) {
+                auto &pos = cubePositions[i];
+                auto model = glm::identity<glm::mat4>();
+                model = glm::translate(model, pos);
+                 float angle = 20.0f * i;
+                 if (i % 3 == 0) {
+                     angle += static_cast<float>(glfwGetTime()) * rotationSpeed * (i % 6 ? -1.0f : 1.0f);
+                 }
+                 model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+                cubeShader.SetUniform<glm::mat4>("model", model);
+                cube.Draw();
             }
-            model = glm::rotate(model, glm::radians(angle),glm::vec3(1.0f, 0.3f, 0.5f));
-            shaderProgram.SetUniform<glm::mat4>("model", model);
-            cube.Draw();
+            texture.Unbind();
+            cubeShader.Unbind();
         }
 
         // check and call events and swap the buffers

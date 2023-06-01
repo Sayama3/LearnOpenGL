@@ -64,6 +64,10 @@ public:
     inline float GetZoom() const {
         return Zoom;
     }
+
+    inline glm::vec3 GetPosition() const {
+        return Position;
+    }
 };
 
 

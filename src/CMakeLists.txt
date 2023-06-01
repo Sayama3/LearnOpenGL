@@ -13,4 +13,5 @@ target_sources(OpenGL PRIVATE
         MathHelper.cpp
         Cube.cpp
         Camera.cpp
+        LightSource.cpp
         )

@@ -2,8 +2,8 @@
 // Created by ianpo on 31/05/2023.
 //
 
-#ifndef LEARNOPENGL_CUBE_HPP
-#define LEARNOPENGL_CUBE_HPP
+#ifndef LEARNOPENGL_LIGHTSOURCE_HPP
+#define LEARNOPENGL_LIGHTSOURCE_HPP
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -14,27 +14,30 @@
 #include "VertexArrayObject.hpp"
 #include "VertexBufferLayout.hpp"
 
-struct CubeVertex {
+struct LightSourceVertex {
     glm::vec3 position;
-    glm::vec3 normal;
     glm::vec2 uv;
     static VertexBufferLayout GetLayout();
 };
 
-class Cube {
+class LightSource {
 private:
+
     VertexArrayObject m_VertexArrayObject;
+    const LightSourceVertex m_VerticesArray[16];
+    const unsigned int m_IndicesArray[36];
     const VertexBufferLayout m_Layout;
-    const float m_VerticesBuffer[36 * (3 + 3 + 2)];
+
     Vertices m_Vertices;
+    Indices m_Indices;
 
 
 public:
-    explicit Cube();
+    explicit LightSource(float size = 1.0f);
     void Bind() const;
     void Unbind() const;
     void Draw() const;
 };
 
 
-#endif //LEARNOPENGL_CUBE_HPP
+#endif //LEARNOPENGL_LIGHTSOURCE_HPP
