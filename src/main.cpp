@@ -54,11 +54,10 @@ int main() {
     Texture2D texture("resources/textures/container.jpg");
     texture.Unbind();
 
+    // === Models ===
     Cube cube;
 
     shaderProgram.Unbind();
-
-//    cube.m_Model = glm::rotate(cube.m_Model, glm::radians(-55.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
     glm::vec3 cubePositions[] = {
     glm::vec3( 0.0f, 0.0f, 0.0f),
@@ -73,30 +72,45 @@ int main() {
     glm::vec3(-1.3f, 1.0f, -1.5f)
     };
     float rotationSpeed = 5.0f;
-    // Rendering
+
+    // === Camera ===
+    // The axis is right-handed
+    glm::vec3 cameraPosition = {0.0f, 0.0f, 3.0f};
+    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    // We want to have the direction from the origin to the camera, has to why it's the "reverse" direction.
+    glm::vec3 cameraReverseDirection = glm::normalize(cameraPosition - cameraTarget);
+    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraReverseDirection));
+    glm::vec3 cameraUp = glm::cross(cameraReverseDirection, cameraRight);
+    glm::mat4 view = glm::mat4(1.0f);
+    view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+
+    // === Projection ===
+    glm::mat4 projection = glm::identity<glm::mat4>();
+
+    // === Rendering ===
     while(!glfwWindowShouldClose(window))
     {
         // Input Processing
         processInput(window);
 
-        //TODO: The rendering/ The renderer
+        // Clearing old image.
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 view = glm::mat4(1.0f);
-        // note that we’re translating the scene in the reverse direction
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-
-        glm::mat4 projection;
-        projection = glm::perspective(glm::radians(60.0f), _width / _height, 0.1f, 100.0f);
-
-        // 4. draw the object
+        // Texture Update
         texture.Bind();
         shaderProgram.Bind();
 
+        // View & Projection Matrix update.
+        view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+        projection = glm::perspective(glm::radians(60.0f), _width / _height, 0.1f, 100.0f);
+
+        // Updating projection & view matrix.
         shaderProgram.SetUniform<glm::mat4>("view", view);
         shaderProgram.SetUniform<glm::mat4>("projection", projection);
 
+        // Rendering meshes.
         for(unsigned int i = 0; i < 10; i++) {
             auto& pos = cubePositions[i];
             glm::mat4 model = glm::identity<glm::mat4>();
