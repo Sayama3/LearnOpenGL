@@ -19,6 +19,14 @@ To correctly run the build, you must have the following architecture :
 resources/
 ├─ shaders/
 │  ├─ shader.frag
+│  ├─ shader2.frag
 │  ├─ shader.vert
+├─ textures/
+│  ├─ container.jpg
 OpenGL.exe
 ```
+
+## Demo
+Here is an example of the current state of the project.
+
+![](https://raw.githubusercontent.com/Sayama3/LearnOpenGL/main/README/gifs/Demo_LearnOpenGL.gif)

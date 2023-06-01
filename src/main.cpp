@@ -103,6 +103,10 @@ int main() {
         shaderProgram.Bind();
 
         // View & Projection Matrix update.
+        const float radius = 10.0f;
+        float camX = glm::sin(glfwGetTime()) * radius;
+        float camZ = glm::cos(glfwGetTime()) * radius;
+        cameraPosition = glm::vec3(camX, 0, camZ);
         view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
         projection = glm::perspective(glm::radians(60.0f), _width / _height, 0.1f, 100.0f);
 
