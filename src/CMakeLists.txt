@@ -12,4 +12,5 @@ target_sources(OpenGL PRIVATE
         Texture2D.cpp
         MathHelper.cpp
         Cube.cpp
+        Camera.cpp
         )

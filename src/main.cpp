@@ -13,19 +13,15 @@
 #include "Texture2D.hpp"
 #include "MathHelper.hpp"
 #include "Cube.hpp"
+#include "Camera.hpp"
+#include "GLFWType.hpp"
 
 float _width = 800;
 float _height = 600;
 
-bool firstMouse = true;
-float lastX, lastY;
-float yaw = -90.0f, pitch;
-float zoom = 60.0f;
+bool cursorEnable = true;
 
-const float cameraSpeed = 5.0f; // adjust accordingly
-glm::vec3 cameraPosition = {0.0f, 0.0f, 3.0f};
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+Camera camera({_width, _height}, {0,0,3});
 
 // Set this in the renderer.
 double currentFrame = 0.0;
@@ -56,6 +52,7 @@ int main() {
     }
     glfwMakeContextCurrent(window);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    cursorEnable = false;
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
@@ -66,8 +63,6 @@ int main() {
         return -1;
     }
     glEnable(GL_DEPTH_TEST);
-
-
 
     // === Shaders ===
     ShaderProgram shaderProgram(ShaderConstructor("resources/shaders/shader.vert", ShaderType::VERTEX_SHADER),
@@ -96,14 +91,6 @@ int main() {
     };
     float rotationSpeed = 5.0f;
 
-    // === Camera ===
-    // The axis is right-handed
-    glm::mat4 view = glm::mat4(1.0f);
-    view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
-
-    // === Projection ===
-    glm::mat4 projection = glm::identity<glm::mat4>();
-
     // === Rendering ===
     while(!glfwWindowShouldClose(window))
     {
@@ -122,16 +109,10 @@ int main() {
         // Texture Update
         texture.Bind();
         shaderProgram.Bind();
-        std::cout << "position  : " << glm::to_string(cameraPosition) << " | ";
-        std::cout << "direction : " << glm::to_string(cameraFront) << '\r';
-
-        // View & Projection Matrix update.
-        view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
-        projection = glm::perspective(glm::radians(zoom), _width / _height, 0.1f, 100.0f);
 
         // Updating projection & view matrix.
-        shaderProgram.SetUniform<glm::mat4>("view", view);
-        shaderProgram.SetUniform<glm::mat4>("projection", projection);
+        shaderProgram.SetUniform<glm::mat4>("view", camera.GetViewMatrix());
+        shaderProgram.SetUniform<glm::mat4>("projection", camera.GetProjectionMatrix());
 
         // Rendering meshes.
         for(unsigned int i = 0; i < 10; i++) {
@@ -158,90 +139,39 @@ int main() {
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    _width = static_cast<float>(width);
-    _height = static_cast<float>(height);
-    glViewport(0, 0, width, height);
+    camera.OnScreenSizeChange({width, height});
 }
-
+bool hasPressCtrl = false;
 void processInput(GLFWwindow *window)
 {
     // Simple exit with the "escape" button for now.
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if(glfwGetKey(window, GLFWKey::KEY_ESCAPE) == GLFWKeyState::PRESS)
     {
         glfwSetWindowShouldClose(window, true);
     }
-    // Keyboard movement
+    if(glfwGetKey(window, GLFWKey::KEY_LEFT_CONTROL) == GLFWKeyState::PRESS && !hasPressCtrl)
     {
-        auto cameraMovement = glm::vec3(0);
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-            cameraMovement += cameraFront;
+        hasPressCtrl = !hasPressCtrl;
+        if(cursorEnable) {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        } else {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-            cameraMovement -= cameraFront;
-        }
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-            cameraMovement -= glm::normalize(glm::cross(cameraFront, cameraUp));
-        }
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-            cameraMovement += glm::normalize(glm::cross(cameraFront, cameraUp));
-        }
-        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-            cameraMovement -= cameraUp;
-        }
-        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-            cameraMovement += cameraUp;
-        }
-//        std::cout << glm::to_string(cameraMovement) << std::endl;
-
-        cameraPosition += cameraSpeed * cameraMovement * static_cast<float>(deltaTime);
+        cursorEnable = !cursorEnable;
+    } else if(glfwGetKey(window, GLFWKey::KEY_LEFT_CONTROL) == GLFWKeyState::RELEASE && hasPressCtrl) {
+        hasPressCtrl = !hasPressCtrl;
     }
+
+    camera.ProcessKeyboard(window, deltaTime);
 }
-
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-    if (firstMouse) // initially set to true
-    {
-        lastX = static_cast<float>(xpos);
-        lastY = static_cast<float>(ypos);
-        firstMouse = false;
-    }
-    float xoffset = static_cast<float>(xpos) - lastX;
-    float yoffset = lastY - static_cast<float>(ypos); // reversed: y ranges bottom to top
-    lastX = static_cast<float>(xpos);
-    lastY = static_cast<float>(ypos);
-
-    const float sensitivity = 0.1f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-
-    yaw += xoffset;
-    pitch += yoffset;
-
-    // SafeGuard for euler angles
-    if(pitch > 89.0f)
-    {
-        pitch = 89.0f;
-    }
-    if(pitch < -89.0f)
-    {
-        pitch = -89.0f;
-    }
-
-    glm::vec3 cameraDirection;
-    cameraDirection.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    cameraDirection.y = sin(glm::radians(pitch));
-    cameraDirection.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    cameraFront = cameraDirection;
-    {
-        glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-        glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraFront));
-        cameraUp = glm::cross(cameraFront, cameraRight);
+    if(!cursorEnable) {
+        camera.ProcessMouseCursor({xpos, ypos});
     }
 }
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    zoom -= (float)yoffset;
-    if (zoom < 1.0f)
-        zoom = 1.0f;
-    if (zoom > 60.0f)
-        zoom = 60.0f;
+    if(!cursorEnable) {
+        camera.ProcessMouseScroll({xoffset, yoffset});
+    }
 }
