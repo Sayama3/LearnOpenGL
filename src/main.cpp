@@ -103,7 +103,7 @@ int main() {
             model = glm::translate(model, pos);
             float angle = 20.0f * i;
             if(i%3 == 0){
-                angle += static_cast<float>(glfwGetTime()) * rotationSpeed * (i%6 ? -1.0 : 1.0);
+                angle += static_cast<float>(glfwGetTime()) * rotationSpeed * (i%6 ? -1.0f : 1.0f);
             }
             model = glm::rotate(model, glm::radians(angle),glm::vec3(1.0f, 0.3f, 0.5f));
             shaderProgram.SetUniform<glm::mat4>("model", model);
