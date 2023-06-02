@@ -56,6 +56,27 @@ Texture2D::Texture2D(const std::string &path, enum TextureFormat textureFormat, 
     Unbind();
 }
 
+Texture2D::Texture2D(glm::vec4 color): m_TextureId(), format(TextureFormat::RGBA), m_Width(1), m_Height(1), m_NbrChannels(4) {
+    glGenTextures(1, &m_TextureId);
+    glBindTexture(TextureType::TEXTURE_2D, m_TextureId);    // set the texture wrapping/filtering options (on currently bound texture)
+
+    // Set Some default params
+    SetParam(TextureParameterName::TEXTURE_WRAP_S, TextureWrapping::REPEAT);
+    SetParam(TextureParameterName::TEXTURE_WRAP_T, TextureWrapping::REPEAT);
+    SetParam(TextureParameterName::TEXTURE_MIN_FILTER, GL_LINEAR);
+    SetParam(TextureParameterName::TEXTURE_MAG_FILTER, GL_LINEAR);
+    unsigned char data[4] = {
+            static_cast<unsigned char>(glm::clamp(color.r, 0.0f, 1.0f) * 255),
+            static_cast<unsigned char>(glm::clamp(color.g, 0.0f, 1.0f) * 255),
+            static_cast<unsigned char>(glm::clamp(color.b, 0.0f, 1.0f) * 255),
+            static_cast<unsigned char>(glm::clamp(color.a, 0.0f, 1.0f) * 255),
+    };
+    glTexImage2D(TextureType::TEXTURE_2D, 0, format, m_Width, m_Height, 0, format, GLType::UNSIGNED_BYTE, data);
+    glGenerateMipmap(TextureType::TEXTURE_2D);
+
+    Unbind();
+}
+
 Texture2D::~Texture2D() {
     glDeleteTextures(1, &m_TextureId);
 }

@@ -68,6 +68,10 @@ public:
     inline glm::vec3 GetPosition() const {
         return Position;
     }
+
+    inline void ResetCursor() {
+        firstMouse = true;
+    }
 };
 
 

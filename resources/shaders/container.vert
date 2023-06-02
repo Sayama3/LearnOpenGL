@@ -10,6 +10,7 @@ uniform mat4 projection = mat4(1.0);
 
 out vec3 FragPos;
 out vec3 Normal;
+out vec2 TexCoords;
 
 void main()
 {
@@ -17,4 +18,5 @@ void main()
     FragPos = vec3(model * vec4(inPosition, 1.0));
     // TODO: have the NormalMatrix in uniform as it's costly.
     Normal = mat3(transpose(inverse(model))) * inNormal;
+    TexCoords = inTexCoord;
 }

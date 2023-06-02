@@ -68,7 +68,7 @@ int main() {
     // === Light ===
     LightSource lightSource;
     ShaderProgram lightSourceShader(ShaderConstructor("resources/shaders/lightsource.vert", ShaderType::VERTEX_SHADER),
-                             ShaderConstructor("resources/shaders/lightsource.frag", ShaderType::FRAGMENT_SHADER));
+                                    ShaderConstructor("resources/shaders/lightsource.frag", ShaderType::FRAGMENT_SHADER));
     lightSourceShader.Bind();
     glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
@@ -80,8 +80,9 @@ int main() {
     cubeShader.SetUniform<glm::vec3>("objectColor", {1.0f, 0.5f, 0.31f});
     cubeShader.SetUniform<glm::vec3>("lightColor", {1.0f, 1.0f, 1.0f});
 
-    Texture2D texture("resources/textures/container.jpg");
-    texture.Unbind();
+//    Texture2D texture("resources/textures/container.jpg");
+    Texture2D diffuseTex("resources/textures/container2.png");
+    Texture2D specularTex("resources/textures/container2_specular.png");
 
     // === Models ===
     Cube cube;
@@ -89,16 +90,16 @@ int main() {
     cubeShader.Unbind();
 
     glm::vec3 cubePositions[] = {
-    glm::vec3( 0.0f, 0.0f, 0.0f),
-    glm::vec3( 2.0f, 5.0f, -15.0f),
-    glm::vec3(-1.5f, -2.2f, -2.5f),
-    glm::vec3(-3.8f, -2.0f, -12.3f),
-    glm::vec3( 2.4f, -0.4f, -3.5f),
-    glm::vec3(-1.7f, 3.0f, -7.5f),
-    glm::vec3( 1.3f, -2.0f, -2.5f),
-    glm::vec3( 1.5f, 2.0f, -2.5f),
-    glm::vec3( 1.5f, 0.2f, -1.5f),
-    glm::vec3(-1.3f, 1.0f, -1.5f),
+            glm::vec3( 0.0f, 0.0f, 0.0f),
+            glm::vec3( 2.0f, 5.0f, -15.0f),
+            glm::vec3(-1.5f, -2.2f, -2.5f),
+            glm::vec3(-3.8f, -2.0f, -12.3f),
+            glm::vec3( 2.4f, -0.4f, -3.5f),
+            glm::vec3(-1.7f, 3.0f, -7.5f),
+            glm::vec3( 1.3f, -2.0f, -2.5f),
+            glm::vec3( 1.5f, 2.0f, -2.5f),
+            glm::vec3( 1.5f, 0.2f, -1.5f),
+            glm::vec3(-1.3f, 1.0f, -1.5f),
     };
     float rotationSpeed = 5.0f;
 
@@ -126,35 +127,50 @@ int main() {
             lightSourceShader.SetUniform<glm::mat4>("model", model);
             lightSourceShader.SetUniform<glm::mat4>("view", camera.GetViewMatrix());
             lightSourceShader.SetUniform<glm::mat4>("projection", camera.GetProjectionMatrix());
-            lightSource.Bind();
             lightSource.Draw();
             lightSourceShader.Unbind();
+            lightSource.Unbind();
         }
 
         // Rendering meshes.
         {
             // Texture Update
-            texture.Bind();
+//            texture.Bind(0);
+            diffuseTex.Bind(0);
+            specularTex.Bind(1);
             cubeShader.Bind();
 
             // Updating projection & view matrix.
             cubeShader.SetUniform<glm::mat4>("view", camera.GetViewMatrix());
             cubeShader.SetUniform<glm::mat4>("projection", camera.GetProjectionMatrix());
-            cubeShader.SetUniform<glm::vec3>("lightPos", lightPos);
             cubeShader.SetUniform<glm::vec3>("viewPos", camera.GetPosition());
+
+            cubeShader.SetUniform<glm::vec3>("light.position", lightPos);
+            cubeShader.SetUniform<glm::vec3>("light.ambient", {0.2f, 0.2f, 0.2f});
+            cubeShader.SetUniform<glm::vec3>("light.diffuse", {0.5f, 0.5f, 0.5f}); // darkened
+            cubeShader.SetUniform<glm::vec3>("light.specular", {1.0f, 1.0f, 1.0f});
             for (unsigned int i = 0; i < sizeof(cubePositions) / sizeof(cubePositions[0]); i++) {
                 auto &pos = cubePositions[i];
                 auto model = glm::identity<glm::mat4>();
                 model = glm::translate(model, pos);
-                 float angle = 20.0f * i;
-                 if (i % 3 == 0) {
-                     angle += static_cast<float>(glfwGetTime()) * rotationSpeed * (i % 6 ? -1.0f : 1.0f);
-                 }
-                 model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+                float angle = 20.0f * i;
+                if (i % 3 == 0) {
+                    angle += static_cast<float>(glfwGetTime()) * rotationSpeed * (i % 6 ? -1.0f : 1.0f);
+                }
+                model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+
+                cubeShader.SetUniform<glm::vec3>("material.ambient", {0.8f, 0.8f, 0.8f});
+                cubeShader.SetUniform<int>("material.diffuseMat", 0);
+                cubeShader.SetUniform<int>("material.specularMat", 1);
+                cubeShader.SetUniform<float>("material.shininess", 32.0f);
+
                 cubeShader.SetUniform<glm::mat4>("model", model);
                 cube.Draw();
+                cube.Unbind();
             }
-            texture.Unbind();
+//            texture.Unbind();
+            diffuseTex.Unbind();
+            specularTex.Unbind();
             cubeShader.Unbind();
         }
 
@@ -184,6 +200,7 @@ void processInput(GLFWwindow *window)
         hasPressCtrl = !hasPressCtrl;
         if(cursorEnable) {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            camera.ResetCursor();
         } else {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
