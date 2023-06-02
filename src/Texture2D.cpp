@@ -17,7 +17,8 @@ Texture2D::Texture2D(const std::string &path, enum TextureFormat textureFormat, 
     SetParam(TextureParameterName::TEXTURE_MAG_FILTER, GL_LINEAR);
 
     stbi_set_flip_vertically_on_load(true);
-    unsigned char *data = stbi_load("resources/textures/container.jpg", &m_Width, &m_Height, &m_NbrChannels, 0);
+    const char* cstr = path.c_str();
+    unsigned char *data = stbi_load(cstr, &m_Width, &m_Height, &m_NbrChannels, 0);
 
     if (data)
     {
@@ -48,10 +49,11 @@ Texture2D::Texture2D(const std::string &path, enum TextureFormat textureFormat, 
     }
     else
     {
-        std::cout << "Failed to load texture\"" << "resources/textures/container.jpg" << "\"." << std::endl;
+        std::cout << "Failed to load texture\"" << path << "\"." << std::endl;
     }
 
     stbi_image_free(data);
+    Unbind();
 }
 
 Texture2D::~Texture2D() {
