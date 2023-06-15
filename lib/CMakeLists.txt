@@ -9,3 +9,6 @@ target_link_libraries(OpenGL PUBLIC OpenGL::GL)
 
 add_subdirectory(glm)
 target_link_libraries(OpenGL PUBLIC glm)
+
+add_subdirectory(assimp)
+target_link_libraries(OpenGL PUBLIC Assimp)
