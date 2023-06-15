@@ -146,14 +146,15 @@ int main() {
             cubeShader.SetUniform<glm::vec3>("viewPos", camera.GetPosition());
 
             // The w can set the vector to be either a direction (w == 0) or a position (w != 0)
-            cubeShader.SetUniform<glm::vec4>("light.position", {lightPos,1.0});
-            cubeShader.SetUniform<glm::vec3>("light.direction", {-0.2f, -1.0f, -0.3f});
+//            cubeShader.SetUniform<glm::vec4>("light.position", {lightPos,1.0});
+//            cubeShader.SetUniform<glm::vec3>("light.direction", {-0.2f, -1.0f, -0.3f});
 
 //            // Kind of a flashlight.
-//            cubeShader.SetUniform<glm::vec4>("light.position", {camera.GetPosition(),1.0});
-//            cubeShader.SetUniform<glm::vec3>("light.direction", camera.GetForward());
+            cubeShader.SetUniform<glm::vec4>("light.position", {camera.GetPosition(),1.0});
+            cubeShader.SetUniform<glm::vec3>("light.direction", camera.GetForward());
 
-            cubeShader.SetUniform<float>("light.cutOff", glm::cos(glm::radians(60.0f)));
+            cubeShader.SetUniform<float>("light.cutOff", glm::cos(glm::radians(12.5f)));
+            cubeShader.SetUniform<float>("light.outerCutOff", glm::cos(glm::radians(17.5f)));
 
             cubeShader.SetUniform<float>("light.constant", 1.0f);
             cubeShader.SetUniform<float>("light.linear", 0.09f);
