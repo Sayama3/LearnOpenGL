@@ -103,6 +103,14 @@ int main() {
     };
     float rotationSpeed = 5.0f;
 
+    glm::vec3 pointLightPositions[] = {
+            glm::vec3( 0.7f, 0.2f, 2.0f),
+            glm::vec3( 2.3f, -3.3f, -4.0f),
+            glm::vec3(-4.0f, 2.0f, -12.0f),
+            glm::vec3( 0.0f, 0.0f, -3.0f)
+    };
+
+
     // === Rendering ===
     while(!glfwWindowShouldClose(window))
     {
@@ -119,18 +127,19 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Rendering LightSource
+        lightSourceShader.Bind();
+        for (auto pointLightPosition : pointLightPositions)
         {
-            lightSourceShader.Bind();
             auto model = glm::mat4(1.0f);
-            model = glm::translate(model, lightPos);
+            model = glm::translate(model, pointLightPosition);
             model = glm::scale(model, glm::vec3(0.2f));
             lightSourceShader.SetUniform<glm::mat4>("model", model);
             lightSourceShader.SetUniform<glm::mat4>("view", camera.GetViewMatrix());
             lightSourceShader.SetUniform<glm::mat4>("projection", camera.GetProjectionMatrix());
             lightSource.Draw();
-            lightSourceShader.Unbind();
-            lightSource.Unbind();
         }
+        lightSourceShader.Unbind();
+        lightSource.Unbind();
 
         // Rendering meshes.
         {
@@ -145,24 +154,46 @@ int main() {
             cubeShader.SetUniform<glm::mat4>("projection", camera.GetProjectionMatrix());
             cubeShader.SetUniform<glm::vec3>("viewPos", camera.GetPosition());
 
-            // The w can set the vector to be either a direction (w == 0) or a position (w != 0)
-//            cubeShader.SetUniform<glm::vec4>("light.position", {lightPos,1.0});
-//            cubeShader.SetUniform<glm::vec3>("light.direction", {-0.2f, -1.0f, -0.3f});
+            // Directional Light
+            {
+                cubeShader.SetUniform<glm::vec3>("directionalLight.direction", {-0.2f, -1.0f, -0.3f});
 
-//            // Kind of a flashlight.
-            cubeShader.SetUniform<glm::vec4>("light.position", {camera.GetPosition(),1.0});
-            cubeShader.SetUniform<glm::vec3>("light.direction", camera.GetForward());
+                cubeShader.SetUniform<glm::vec3>("directionalLight.ambient", {0.2f, 0.2f, 0.2f});
+                cubeShader.SetUniform<glm::vec3>("directionalLight.diffuse", {0.5f, 0.5f, 0.5f});
+                cubeShader.SetUniform<glm::vec3>("directionalLight.specular", {1.0f, 1.0f, 1.0f});
+            }
 
-            cubeShader.SetUniform<float>("light.cutOff", glm::cos(glm::radians(12.5f)));
-            cubeShader.SetUniform<float>("light.outerCutOff", glm::cos(glm::radians(17.5f)));
+           // Point Lights
+            for (int i = 0; i < sizeof(pointLightPositions)/ sizeof(pointLightPositions[0]); ++i) {
+                cubeShader.SetUniform<glm::vec3>("pointLights["+std::to_string(i)+"].position", pointLightPositions[i]);
 
-            cubeShader.SetUniform<float>("light.constant", 1.0f);
-            cubeShader.SetUniform<float>("light.linear", 0.09f);
-            cubeShader.SetUniform<float>("light.quadratic", 0.032f);
+                cubeShader.SetUniform<glm::vec3>("pointLights["+std::to_string(i)+"].ambient", {0.2f, 0.2f, 0.2f});
+                cubeShader.SetUniform<glm::vec3>("pointLights["+std::to_string(i)+"].diffuse", {0.5f, 0.5f, 0.5f});
+                cubeShader.SetUniform<glm::vec3>("pointLights["+std::to_string(i)+"].specular", {1.0f, 1.0f, 1.0f});
 
-            cubeShader.SetUniform<glm::vec3>("light.ambient", {0.2f, 0.2f, 0.2f});
-            cubeShader.SetUniform<glm::vec3>("light.diffuse", {0.5f, 0.5f, 0.5f}); // darkened
-            cubeShader.SetUniform<glm::vec3>("light.specular", {1.0f, 1.0f, 1.0f});
+                cubeShader.SetUniform<float>("pointLights["+std::to_string(i)+"].constant", 1.0f);
+                cubeShader.SetUniform<float>("pointLights["+std::to_string(i)+"].linear", 0.09f);
+                cubeShader.SetUniform<float>("pointLights["+std::to_string(i)+"].quadratic", 0.032f);
+            }
+
+            // SpotLight
+            {
+                cubeShader.SetUniform<glm::vec3>("spotLight.position", camera.GetPosition());
+                cubeShader.SetUniform<glm::vec3>("spotLight.direction", camera.GetForward());
+
+                cubeShader.SetUniform<glm::vec3>("spotLight.ambient", {0.2f, 0.2f, 0.2f});
+                cubeShader.SetUniform<glm::vec3>("spotLight.diffuse", {0.5f, 0.5f, 0.5f});
+                cubeShader.SetUniform<glm::vec3>("spotLight.specular", {1.0f, 1.0f, 1.0f});
+
+                cubeShader.SetUniform<float>("spotLight.constant", 1.0f);
+                cubeShader.SetUniform<float>("spotLight.linear", 0.09f);
+                cubeShader.SetUniform<float>("spotLight.quadratic", 0.032f);
+
+                cubeShader.SetUniform<float>("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+                cubeShader.SetUniform<float>("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
+            }
+
+            // Meshes
             for (unsigned int i = 0; i < sizeof(cubePositions) / sizeof(cubePositions[0]); i++) {
                 auto &pos = cubePositions[i];
                 auto model = glm::identity<glm::mat4>();
