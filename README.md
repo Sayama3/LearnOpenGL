@@ -18,15 +18,29 @@ To correctly run the build, you must have the following architecture :
 ```text
 resources/
 ├─ shaders/
-│  ├─ shader.frag
-│  ├─ shader2.frag
-│  ├─ shader.vert
+│  ├─ container.frag
+│  ├─ container.vert
+│  ├─ lightsource.frag
+│  ├─ lightsource.vert
 ├─ textures/
 │  ├─ container.jpg
+│  ├─ container2.png
+│  ├─ container2_specular.png
 OpenGL.exe
 ```
+
+## Inputs
+
+To run the demo, you have to use `WASDQE`.
+
+To rotate the camera you have to use the `Mouse`
+
+To enable/disable the cursor/input you can press `Left Ctrl`.
+
+To quit de demo you can press `Escape`.
+
 
 ## Demo
 Here is an example of the current state of the project.
 
-![](https://raw.githubusercontent.com/Sayama3/LearnOpenGL/main/README/gifs/Demo_LearnOpenGL_01062023_02.gif)
+![](https://raw.githubusercontent.com/Sayama3/LearnOpenGL/main/README/gifs/Demo_LearnOpenGL_15062023_01.gif)
