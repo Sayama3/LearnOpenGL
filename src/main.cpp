@@ -6,8 +6,8 @@
 #include <string>
 #include <glm/gtx/string_cast.hpp>
 #include "SystemHelper.hpp"
-#include "Vertices.hpp"
-#include "Indices.hpp"
+#include "VertexBufferObject.hpp"
+#include "ElementBufferObject.hpp"
 #include "VertexArrayObject.hpp"
 #include "ShaderProgram.hpp"
 #include "Texture2D.hpp"
@@ -16,6 +16,12 @@
 #include "Camera.hpp"
 #include "GLFWType.hpp"
 #include "LightSource.hpp"
+
+// For visual studio, we need this to access the usual math macro.
+// Using it here as I cannot add it on the cmakelist.
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#endif
 
 float _width = 800;
 float _height = 600;

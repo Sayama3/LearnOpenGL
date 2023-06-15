@@ -4,7 +4,8 @@ cmake_minimum_required(VERSION 3.25)
 set(CMAKE_CXX_FLAGS_DEBUG_INIT "-g")
 
 # for visual studio : enable the math define
-add_definitions(-D_USE_MATH_DEFINES)
+# Remove because assimp already include the "_USE_MATH_DEFINES" preprocessor
+#add_definitions(-D_USE_MATH_DEFINES)
 
 # we use the c++ 20
 set(CMAKE_CXX_STANDARD 20)

@@ -9,8 +9,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <array>
-#include "Indices.hpp"
-#include "Vertices.hpp"
+#include "ElementBufferObject.hpp"
+#include "VertexBufferObject.hpp"
 #include "VertexArrayObject.hpp"
 #include "VertexBufferLayout.hpp"
 
@@ -26,7 +26,7 @@ private:
     VertexArrayObject m_VertexArrayObject;
     const VertexBufferLayout m_Layout;
     const float m_VerticesBuffer[36 * (3 + 3 + 2)];
-    Vertices m_Vertices;
+    VertexBufferObject m_Vertices;
 
 
 public:

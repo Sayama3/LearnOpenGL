@@ -5,7 +5,7 @@
 #ifndef LEARNOPENGL_VERTEXARRAYOBJECT_HPP
 #define LEARNOPENGL_VERTEXARRAYOBJECT_HPP
 
-#include "Vertices.hpp"
+#include "VertexBufferObject.hpp"
 #include "VertexBufferLayout.hpp"
 
 class VertexArrayObject {
@@ -18,7 +18,7 @@ public:
     void Bind() const;
     void Unbind() const;
 
-    void AddVertex(const Vertices & vertices, const VertexBufferLayout & layout);
+    void AddVertex(const VertexBufferObject & vertices, const VertexBufferLayout & layout);
 
     inline const unsigned int GetId() const {return m_VertexArrayId;}
 };

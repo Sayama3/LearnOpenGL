@@ -9,8 +9,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <array>
-#include "Indices.hpp"
-#include "Vertices.hpp"
+#include "ElementBufferObject.hpp"
+#include "VertexBufferObject.hpp"
 #include "VertexArrayObject.hpp"
 #include "VertexBufferLayout.hpp"
 
@@ -28,8 +28,8 @@ private:
     const unsigned int m_IndicesArray[36];
     const VertexBufferLayout m_Layout;
 
-    Vertices m_Vertices;
-    Indices m_Indices;
+    VertexBufferObject m_Vertices;
+    ElementBufferObject m_Indices;
 
 
 public:

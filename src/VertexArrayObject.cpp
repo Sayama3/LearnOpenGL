@@ -24,7 +24,7 @@ void VertexArrayObject::Unbind() const {
     glBindVertexArray(0);
 }
 
-void VertexArrayObject::AddVertex(const Vertices & vertices, const VertexBufferLayout & layout) {
+void VertexArrayObject::AddVertex(const VertexBufferObject & vertices, const VertexBufferLayout & layout) {
     Bind();
     vertices.Bind();
 
