@@ -49,7 +49,7 @@ Texture2D::Texture2D(const std::string &path, enum TextureFormat textureFormat, 
     }
     else
     {
-        std::cout << "Failed to load texture\"" << path << "\"." << std::endl;
+        std::cout << "Failed to load texture \"" << path << "\".\n" << stbi_failure_reason() << std::endl;
     }
 
     stbi_image_free(data);

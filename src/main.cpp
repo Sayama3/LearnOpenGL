@@ -145,7 +145,13 @@ int main() {
             cubeShader.SetUniform<glm::mat4>("projection", camera.GetProjectionMatrix());
             cubeShader.SetUniform<glm::vec3>("viewPos", camera.GetPosition());
 
-            cubeShader.SetUniform<glm::vec3>("light.position", lightPos);
+            // The w can set the vector to be either a direction (w == 0) or a position (w != 0)
+            cubeShader.SetUniform<glm::vec4>("light.vector", {lightPos.x,lightPos.y,lightPos.z,1.0});
+            cubeShader.SetUniform<float>("light.constant", 1.0f);
+            cubeShader.SetUniform<float>("light.linear", 0.09f);
+            cubeShader.SetUniform<float>("light.quadratic", 0.032f);
+            //            cubeShader.SetUniform<glm::vec4>("light.vector", {-0.2f, -1.0f, -0.3f, 0.0f});
+
             cubeShader.SetUniform<glm::vec3>("light.ambient", {0.2f, 0.2f, 0.2f});
             cubeShader.SetUniform<glm::vec3>("light.diffuse", {0.5f, 0.5f, 0.5f}); // darkened
             cubeShader.SetUniform<glm::vec3>("light.specular", {1.0f, 1.0f, 1.0f});
@@ -153,7 +159,7 @@ int main() {
                 auto &pos = cubePositions[i];
                 auto model = glm::identity<glm::mat4>();
                 model = glm::translate(model, pos);
-                float angle = 20.0f * i;
+                float angle = 20.0f * static_cast<float>(i);
                 if (i % 3 == 0) {
                     angle += static_cast<float>(glfwGetTime()) * rotationSpeed * (i % 6 ? -1.0f : 1.0f);
                 }
