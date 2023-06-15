@@ -69,6 +69,18 @@ public:
         return Position;
     }
 
+    inline glm::vec3 GetForward() const {
+        return Front;
+    }
+
+    inline glm::vec3 GetUp() const {
+        return Up;
+    }
+
+    inline glm::vec3 GetRight() const {
+        return Right;
+    }
+
     inline void ResetCursor() {
         firstMouse = true;
     }
