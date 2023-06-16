@@ -4,18 +4,14 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <string>
-#include <glm/gtx/string_cast.hpp>
 #include "SystemHelper.hpp"
-#include "VertexBufferObject.hpp"
-#include "ElementBufferObject.hpp"
-#include "VertexArrayObject.hpp"
 #include "ShaderProgram.hpp"
 #include "Texture2D.hpp"
 #include "MathHelper.hpp"
-#include "Cube.hpp"
 #include "Camera.hpp"
 #include "GLFWType.hpp"
 #include "LightSource.hpp"
+#include "Model.hpp"
 
 // For visual studio, we need this to access the usual math macro.
 // Using it here as I cannot add it on the cmakelist.
@@ -87,11 +83,12 @@ int main() {
     cubeShader.SetUniform<glm::vec3>("lightColor", {1.0f, 1.0f, 1.0f});
 
 //    Texture2D texture("resources/textures/container.jpg");
-    Texture2D diffuseTex("resources/textures/container2.png");
-    Texture2D specularTex("resources/textures/container2_specular.png");
+    Texture2D diffuseTex("resources/textures/container2.png", TextureUsage::Diffuse);
+    Texture2D specularTex("resources/textures/container2_specular.png", TextureUsage::Specular);
 
     // === Models ===
-    Cube cube;
+
+    Model model1("resources/models/SurvivalGuitarBackpack/Survival_BackPack_2.fbx");
 
     cubeShader.Unbind();
 
@@ -211,14 +208,15 @@ int main() {
                 model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 
                 cubeShader.SetUniform<glm::vec3>("material.ambient", {0.8f, 0.8f, 0.8f});
-                cubeShader.SetUniform<int>("material.diffuseMat", 0);
-                cubeShader.SetUniform<int>("material.specularMat", 1);
+//                cubeShader.SetUniform<int>("material.diffuseMat", 0);
+//                cubeShader.SetUniform<int>("material.specularMat", 1);
                 cubeShader.SetUniform<float>("material.shininess", 32.0f);
 
                 cubeShader.SetUniform<glm::mat4>("model", model);
-                cube.Draw();
-                cube.Unbind();
+                model1.Draw(cubeShader);
             }
+            cubeShader.SetUniform<glm::mat4>("model", glm::identity<glm::mat4>());
+            model1.Draw(cubeShader);
 //            texture.Unbind();
             diffuseTex.Unbind();
             specularTex.Unbind();

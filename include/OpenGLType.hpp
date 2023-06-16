@@ -83,6 +83,33 @@ enum GLType {
     UNSIGNED_INT_10F_11F_11F_REV = GL_UNSIGNED_INT_10F_11F_11F_REV,
 };
 
+inline unsigned int GetSizeOfGLType(enum GLType type) {
+    switch (type) {
+        case BYTE:
+            return sizeof(GLbyte);
+        case UNSIGNED_BYTE:
+            return sizeof(GLuint);
+        case SHORT:
+            return sizeof(GLshort);
+        case UNSIGNED_SHORT:
+            return sizeof(GLushort);
+        case INT:
+            return sizeof(GLint);
+        case UNSIGNED_INT:
+            return sizeof(GLuint);
+        case HALF_FLOAT:
+            return sizeof(GLhalf);
+        case FLOAT:
+            return sizeof(GLfloat);
+        case DOUBLE:
+            return sizeof(GLdouble);
+        case FIXED:
+            return sizeof(GLfixed);
+        default:
+            return 0;
+    }
+}
+
 enum GLDrawMode {
     POINTS = GL_POINTS,
     LINE_STRIP = GL_LINE_STRIP,

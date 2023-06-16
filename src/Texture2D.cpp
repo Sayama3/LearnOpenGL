@@ -6,7 +6,7 @@
 #include "stb_image.h"
 #include <iostream>
 
-Texture2D::Texture2D(const std::string &path, TextureUsage textureUsage, enum TextureFormat textureFormat, enum GLType pixelDataType) : m_CurrentSlot(-1), m_TextureId(), format(textureFormat), m_Width(-1), m_Height(-1), m_NbrChannels(-1), m_TextureUsage(textureUsage) {
+Texture2D::Texture2D(const std::string &path, TextureUsage textureUsage, enum TextureFormat textureFormat, enum GLType pixelDataType) : m_Path(path), m_CurrentSlot(-1), m_TextureId(), format(textureFormat), m_Width(-1), m_Height(-1), m_NbrChannels(-1), m_PixelType(pixelDataType), m_Params(), m_TextureUsage(textureUsage) {
     glGenTextures(1, &m_TextureId);
     glBindTexture(TextureType::TEXTURE_2D, m_TextureId);    // set the texture wrapping/filtering options (on currently bound texture)
 
@@ -44,7 +44,7 @@ Texture2D::Texture2D(const std::string &path, TextureUsage textureUsage, enum Te
             }
         }
 
-        glTexImage2D(TextureType::TEXTURE_2D, 0, format, m_Width, m_Height, 0, format, pixelDataType, data);
+        glTexImage2D(TextureType::TEXTURE_2D, 0, format, m_Width, m_Height, 0, format, m_PixelType, data);
         glGenerateMipmap(TextureType::TEXTURE_2D);
     }
     else
@@ -56,7 +56,25 @@ Texture2D::Texture2D(const std::string &path, TextureUsage textureUsage, enum Te
     Unbind();
 }
 
-Texture2D::Texture2D(glm::vec4 color, TextureUsage textureUsage): m_CurrentSlot(-1), m_TextureId(), format(TextureFormat::RGBA), m_Width(1), m_Height(1), m_NbrChannels(4), m_TextureUsage(textureUsage) {
+Texture2D::Texture2D(const Texture2D &other) : m_Path(other.m_Path), m_CurrentSlot(other.m_CurrentSlot), m_TextureId(other.m_TextureId), format(other.format), m_Width(other.m_Width), m_Height(other.m_Height), m_NbrChannels(other.m_NbrChannels), m_PixelType(other.m_PixelType), m_Params(other.m_Params), m_TextureUsage(other.m_TextureUsage){
+    glBindTexture(TextureType::TEXTURE_2D, other.m_TextureId);
+    void* pixels = malloc(other.m_Width * other.m_Height * other.m_NbrChannels * GetSizeOfGLType(other.m_PixelType));
+    glGetTexImage(TextureType::TEXTURE_2D, 0, other.format, other.m_PixelType, pixels);
+
+    glGenTextures(1, &m_TextureId);
+    glBindTexture(TextureType::TEXTURE_2D, m_TextureId);
+
+    for (const auto& param: m_Params) {
+        SetParam(param.first, param.second, false);
+    }
+
+    glTexImage2D(TextureType::TEXTURE_2D, 0, format, m_Width, m_Height, 0, format, m_PixelType, pixels);
+    glGenerateMipmap(TextureType::TEXTURE_2D);
+    free(pixels);
+}
+
+
+Texture2D::Texture2D(glm::vec4 color, TextureUsage textureUsage): m_Path(), m_CurrentSlot(-1), m_TextureId(), format(TextureFormat::RGBA), m_Width(1), m_Height(1), m_NbrChannels(4), m_PixelType(GLType::UNSIGNED_BYTE), m_Params(), m_TextureUsage(textureUsage) {
     glGenTextures(1, &m_TextureId);
     glBindTexture(TextureType::TEXTURE_2D, m_TextureId);    // set the texture wrapping/filtering options (on currently bound texture)
 
@@ -71,7 +89,7 @@ Texture2D::Texture2D(glm::vec4 color, TextureUsage textureUsage): m_CurrentSlot(
             static_cast<unsigned char>(glm::clamp(color.b, 0.0f, 1.0f) * 255),
             static_cast<unsigned char>(glm::clamp(color.a, 0.0f, 1.0f) * 255),
     };
-    glTexImage2D(TextureType::TEXTURE_2D, 0, format, m_Width, m_Height, 0, format, GLType::UNSIGNED_BYTE, data);
+    glTexImage2D(TextureType::TEXTURE_2D, 0, format, m_Width, m_Height, 0, format, m_PixelType, data);
     glGenerateMipmap(TextureType::TEXTURE_2D);
 
     Unbind();
@@ -110,5 +128,10 @@ int Texture2D::GetTextureIndex() {
  * @param value The value of the parameter.
  */
 void Texture2D::SetParam(TextureParameterName name, int value) {
+    SetParam(name, value, true);
+}
+
+void Texture2D::SetParam(TextureParameterName name, int value, bool updateMap) {
+    if(updateMap) m_Params[name] = value;
     glTexParameteri(TextureType::TEXTURE_2D, name, value);
 }

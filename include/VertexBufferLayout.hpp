@@ -17,9 +17,7 @@ struct VertexBufferElement {
     int count;
     bool normalized;
 
-    inline unsigned int GetSizeOfType() const { return GetSizeOfType(type); }
-
-    static unsigned int GetSizeOfType(enum GLType type);
+    inline unsigned int GetSizeOfType() const { return GetSizeOfGLType(type); }
 };
 
 class VertexBufferLayout {
