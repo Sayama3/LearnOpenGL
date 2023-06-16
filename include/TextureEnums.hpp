@@ -6,6 +6,7 @@
 #define LEARNOPENGL_TEXTUREENUMS_HPP
 
 #include <glad/glad.h>
+#include <string>
 
 enum TextureType {
     TEXTURE_1D = GL_TEXTURE_1D,
@@ -115,4 +116,34 @@ enum TextureSlot : unsigned int {
     COUNT = 32,
 };
 
+enum TextureUsage {
+    Other,
+    Ambient,
+    Diffuse,
+    Specular,
+//    Emissive,
+    Count,
+};
+
+inline std::string TextureUsageToName(TextureUsage textureUsage) {
+    std::string name;
+    switch (textureUsage) {
+        case Other:
+            name = "texture_other";
+            break;
+        case Ambient:
+            name = "texture_ambient";
+            break;
+        case Diffuse:
+            name = "texture_diffuse";
+            break;
+        case Specular:
+            name = "texture_specular";
+            break;
+        default:
+            name = "texture_unknown";
+            break;
+    }
+    return name;
+}
 #endif //LEARNOPENGL_TEXTUREENUMS_HPP

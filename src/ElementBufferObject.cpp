@@ -4,7 +4,7 @@
 
 #include "ElementBufferObject.hpp"
 
-ElementBufferObject::ElementBufferObject(const unsigned int *indices, unsigned int count, BufferUsage bufferUsage) : m_BufferId(), m_BufferType(BufferType::ELEMENT_ARRAY_BUFFER) {
+ElementBufferObject::ElementBufferObject(const unsigned int *indices, unsigned int count, BufferUsage bufferUsage) : m_BufferId(), m_BufferType(BufferType::ELEMENT_ARRAY_BUFFER), m_IndicesCount(static_cast<int>(count)) {
     glGenBuffers(1, &this->m_BufferId);
     glBindBuffer(m_BufferType, m_BufferId);
     glBufferData(m_BufferType, count * sizeof(unsigned int), indices, bufferUsage);
@@ -20,4 +20,8 @@ void ElementBufferObject::Bind() const {
 
 void ElementBufferObject::Unbind() const {
     glBindBuffer(m_BufferType, 0);
+}
+
+void ElementBufferObject::Draw(GLDrawMode drawMode) const {
+    glDrawElements(drawMode, m_IndicesCount, GLType::UNSIGNED_INT, (void*) 0);
 }

@@ -9,19 +9,27 @@
 #include "Vertex.hpp"
 #include "Texture2D.hpp"
 #include "VertexArrayObject.hpp"
-#include "VertexBufferLayout.hpp"
 #include "VertexBufferObject.hpp"
 #include "ElementBufferObject.hpp"
+#include "VertexBufferLayout.hpp"
+#include "ShaderProgram.hpp"
 
 class Mesh {
 public:
-    std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
-    std::vector<Texture2D> textures;
+    std::vector<Vertex> m_Vertices;
+    std::vector<unsigned int> m_Indices;
+    std::vector<Texture2D> m_Textures;
+
+    Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture2D>& textures, BufferUsage usage = BufferUsage::STATIC_DRAW);
+    void Draw(ShaderProgram& shader);
+
 private:
-    VertexArrayObject vao;
-    VertexBufferObject vbo;
-    ElementBufferObject ebo;
+    VertexBufferLayout m_Layout;
+    VertexArrayObject m_VAO;
+    VertexBufferObject m_VBO;
+    ElementBufferObject m_EBO;
+
+    void SetupMesh();
 };
 
 

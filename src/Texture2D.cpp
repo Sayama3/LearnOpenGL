@@ -6,15 +6,15 @@
 #include "stb_image.h"
 #include <iostream>
 
-Texture2D::Texture2D(const std::string &path, enum TextureFormat textureFormat, enum GLType pixelDataType) : m_TextureId(), format(textureFormat), m_Width(-1), m_Height(-1), m_NbrChannels(-1) {
+Texture2D::Texture2D(const std::string &path, TextureUsage textureUsage, enum TextureFormat textureFormat, enum GLType pixelDataType) : m_CurrentSlot(-1), m_TextureId(), format(textureFormat), m_Width(-1), m_Height(-1), m_NbrChannels(-1), m_TextureUsage(textureUsage) {
     glGenTextures(1, &m_TextureId);
     glBindTexture(TextureType::TEXTURE_2D, m_TextureId);    // set the texture wrapping/filtering options (on currently bound texture)
 
     // Set Some default params
-    SetParam(TextureParameterName::TEXTURE_WRAP_S, TextureWrapping::REPEAT);
-    SetParam(TextureParameterName::TEXTURE_WRAP_T, TextureWrapping::REPEAT);
-    SetParam(TextureParameterName::TEXTURE_MIN_FILTER, GL_LINEAR);
-    SetParam(TextureParameterName::TEXTURE_MAG_FILTER, GL_LINEAR);
+    this->SetParam(TextureParameterName::TEXTURE_WRAP_S, TextureWrapping::REPEAT);
+    this->SetParam(TextureParameterName::TEXTURE_WRAP_T, TextureWrapping::REPEAT);
+    this->SetParam(TextureParameterName::TEXTURE_MIN_FILTER, GL_LINEAR);
+    this->SetParam(TextureParameterName::TEXTURE_MAG_FILTER, GL_LINEAR);
 
     stbi_set_flip_vertically_on_load(true);
     const char* cstr = path.c_str();
@@ -56,7 +56,7 @@ Texture2D::Texture2D(const std::string &path, enum TextureFormat textureFormat, 
     Unbind();
 }
 
-Texture2D::Texture2D(glm::vec4 color): m_TextureId(), format(TextureFormat::RGBA), m_Width(1), m_Height(1), m_NbrChannels(4) {
+Texture2D::Texture2D(glm::vec4 color, TextureUsage textureUsage): m_CurrentSlot(-1), m_TextureId(), format(TextureFormat::RGBA), m_Width(1), m_Height(1), m_NbrChannels(4), m_TextureUsage(textureUsage) {
     glGenTextures(1, &m_TextureId);
     glBindTexture(TextureType::TEXTURE_2D, m_TextureId);    // set the texture wrapping/filtering options (on currently bound texture)
 
@@ -85,13 +85,25 @@ void Texture2D::Bind(unsigned int slot) {
     if(slot >= TextureSlot::COUNT) {
         std::cout << "The maximum texture slot is " << TextureSlot::COUNT - 1 << ". You want the " << slot << " slot, the result will be unexpected." << std::endl;
     }
-    glActiveTexture(TextureSlot::TEXTURE0 + slot);
+    m_CurrentSlot = slot;
+    glActiveTexture(TextureSlot::TEXTURE0 + m_CurrentSlot);
     glBindTexture(TextureType::TEXTURE_2D, m_TextureId);
 }
 
 void Texture2D::Unbind() {
+    glActiveTexture(TextureSlot::TEXTURE0 + m_CurrentSlot);
     glBindTexture(TextureType::TEXTURE_2D, 0);
+    m_CurrentSlot = -1;
 }
+
+TextureSlot Texture2D::GetTextureSlot() {
+    return static_cast<TextureSlot>(TextureSlot::TEXTURE0 + m_CurrentSlot);
+}
+
+int Texture2D::GetTextureIndex() {
+    return static_cast<int>(m_CurrentSlot);
+}
+
 /**
  * Must bind the texture before changing it's param.
  * @param name The name of the parameter.

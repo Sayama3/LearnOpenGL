@@ -7,7 +7,8 @@
 
 #include <vector>
 #include <stdexcept>
-#include "glad/glad.h"
+#include <glad/glad.h>
+#include <glm/glm.hpp>
 #include "OpenGLType.hpp"
 
 
@@ -29,7 +30,7 @@ public:
     VertexBufferLayout();
 
     template<typename T>
-    inline void Push(int count) {
+    inline void Push(int count = 1) {
         throw std::runtime_error("Type not implemented.");
     }
 
@@ -42,10 +43,34 @@ template<>
 void VertexBufferLayout::Push<float>(int count);
 
 template<>
+void VertexBufferLayout::Push<glm::vec1>(int count);
+
+template<>
+void VertexBufferLayout::Push<glm::vec2>(int count);
+
+template<>
+void VertexBufferLayout::Push<glm::vec3>(int count);
+
+template<>
+void VertexBufferLayout::Push<glm::vec4>(int count);
+
+template<>
 void VertexBufferLayout::Push<unsigned int>(int count);
 
 template<>
 void VertexBufferLayout::Push<int>(int count);
+
+template<>
+void VertexBufferLayout::Push<glm::ivec1>(int count);
+
+template<>
+void VertexBufferLayout::Push<glm::ivec2>(int count);
+
+template<>
+void VertexBufferLayout::Push<glm::ivec3>(int count);
+
+template<>
+void VertexBufferLayout::Push<glm::ivec4>(int count);
 
 template<>
 void VertexBufferLayout::Push<unsigned char>(int count);
