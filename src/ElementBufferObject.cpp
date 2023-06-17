@@ -23,5 +23,5 @@ void ElementBufferObject::Unbind() const {
 }
 
 void ElementBufferObject::Draw(GLDrawMode drawMode) const {
-    glDrawElements(drawMode, m_IndicesCount, GLType::UNSIGNED_INT, (void*) 0);
+    glDrawElements(drawMode, static_cast<unsigned int>(m_IndicesCount), GLType::UNSIGNED_INT, (void*) 0);
 }

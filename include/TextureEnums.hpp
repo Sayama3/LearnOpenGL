@@ -113,7 +113,7 @@ enum TextureSlot : unsigned int {
     TEXTURE29 = GL_TEXTURE29,
     TEXTURE30 = GL_TEXTURE30,
     TEXTURE31 = GL_TEXTURE31,
-    COUNT = 32,
+    COUNT = (GL_MAX_TEXTURE_IMAGE_UNITS - GL_TEXTURE0),
 };
 
 enum TextureUsage {
@@ -121,7 +121,9 @@ enum TextureUsage {
     Ambient,
     Diffuse,
     Specular,
-//    Emissive,
+    Normal,
+    Height,
+    Emissive,
     Count,
 };
 
@@ -139,6 +141,15 @@ inline std::string TextureUsageToName(TextureUsage textureUsage) {
             break;
         case Specular:
             name = "texture_specular";
+            break;
+        case Normal:
+            name = "texture_normal";
+            break;
+        case Height:
+            name = "texture_height";
+            break;
+        case Emissive:
+            name = "texture_emissive";
             break;
         default:
             name = "texture_unknown";

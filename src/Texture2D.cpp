@@ -4,9 +4,10 @@
 
 #include "Texture2D.hpp"
 #include "stb_image.h"
-#include <iostream>
+#include "Logger.hpp"
 
-Texture2D::Texture2D(const std::string &path, TextureUsage textureUsage, enum TextureFormat textureFormat, enum GLType pixelDataType) : m_Path(path), m_CurrentSlot(-1), m_TextureId(), format(textureFormat), m_Width(-1), m_Height(-1), m_NbrChannels(-1), m_PixelType(pixelDataType), m_Params(), m_TextureUsage(textureUsage) {
+Texture2D::Texture2D(const std::string &path, TextureUsage textureUsage, bool autoDestroy, enum TextureFormat textureFormat, enum GLType pixelDataType) : m_Path(path), m_CurrentSlot(-1), m_TextureId(), format(textureFormat), m_Width(-1), m_Height(-1), m_NbrChannels(-1), m_PixelType(pixelDataType), m_Params(), m_AutoDestroy(autoDestroy), m_TextureUsage(textureUsage) {
+    LOG("Creating \"" + m_Path + "\"");
     glGenTextures(1, &m_TextureId);
     glBindTexture(TextureType::TEXTURE_2D, m_TextureId);    // set the texture wrapping/filtering options (on currently bound texture)
 
@@ -49,29 +50,29 @@ Texture2D::Texture2D(const std::string &path, TextureUsage textureUsage, enum Te
     }
     else
     {
-        std::cout << "Failed to load texture \"" << path << "\".\n" << stbi_failure_reason() << std::endl;
+        LOG("Failed to load texture \"" + path + "\".\n" + stbi_failure_reason());
     }
 
     stbi_image_free(data);
     Unbind();
 }
 
-Texture2D::Texture2D(const Texture2D &other) : m_Path(other.m_Path), m_CurrentSlot(other.m_CurrentSlot), m_TextureId(other.m_TextureId), format(other.format), m_Width(other.m_Width), m_Height(other.m_Height), m_NbrChannels(other.m_NbrChannels), m_PixelType(other.m_PixelType), m_Params(other.m_Params), m_TextureUsage(other.m_TextureUsage){
-    glBindTexture(TextureType::TEXTURE_2D, other.m_TextureId);
-    void* pixels = malloc(other.m_Width * other.m_Height * other.m_NbrChannels * GetSizeOfGLType(other.m_PixelType));
-    glGetTexImage(TextureType::TEXTURE_2D, 0, other.format, other.m_PixelType, pixels);
-
-    glGenTextures(1, &m_TextureId);
-    glBindTexture(TextureType::TEXTURE_2D, m_TextureId);
-
-    for (const auto& param: m_Params) {
-        SetParam(param.first, param.second, false);
-    }
-
-    glTexImage2D(TextureType::TEXTURE_2D, 0, format, m_Width, m_Height, 0, format, m_PixelType, pixels);
-    glGenerateMipmap(TextureType::TEXTURE_2D);
-    free(pixels);
-}
+//Texture2D::Texture2D(const Texture2D &other) : m_Path(other.m_Path), m_CurrentSlot(other.m_CurrentSlot), m_TextureId(other.m_TextureId), format(other.format), m_Width(other.m_Width), m_Height(other.m_Height), m_NbrChannels(other.m_NbrChannels), m_PixelType(other.m_PixelType), m_Params(other.m_Params), m_TextureUsage(other.m_TextureUsage){
+//    glBindTexture(TextureType::TEXTURE_2D, other.m_TextureId);
+//    void* pixels = malloc(other.m_Width * other.m_Height * other.m_NbrChannels * GetSizeOfGLType(other.m_PixelType));
+//    glGetTexImage(TextureType::TEXTURE_2D, 0, other.format, other.m_PixelType, pixels);
+//
+//    glGenTextures(1, &m_TextureId);
+//    glBindTexture(TextureType::TEXTURE_2D, m_TextureId);
+//
+//    for (const auto& param: m_Params) {
+//        SetParam(param.first, param.second, false);
+//    }
+//
+//    glTexImage2D(TextureType::TEXTURE_2D, 0, format, m_Width, m_Height, 0, format, m_PixelType, pixels);
+//    glGenerateMipmap(TextureType::TEXTURE_2D);
+//    free(pixels);
+//}
 
 
 Texture2D::Texture2D(glm::vec4 color, TextureUsage textureUsage): m_Path(), m_CurrentSlot(-1), m_TextureId(), format(TextureFormat::RGBA), m_Width(1), m_Height(1), m_NbrChannels(4), m_PixelType(GLType::UNSIGNED_BYTE), m_Params(), m_TextureUsage(textureUsage) {
@@ -96,14 +97,19 @@ Texture2D::Texture2D(glm::vec4 color, TextureUsage textureUsage): m_Path(), m_Cu
 }
 
 Texture2D::~Texture2D() {
+    if(m_AutoDestroy) Destroy();
+}
+
+void Texture2D::Destroy() {
+    LOG("Destroying \"" + m_Path + "\"");
     glDeleteTextures(1, &m_TextureId);
 }
 
 void Texture2D::Bind(unsigned int slot) {
     if(slot >= TextureSlot::COUNT) {
-        std::cout << "The maximum texture slot is " << TextureSlot::COUNT - 1 << ". You want the " << slot << " slot, the result will be unexpected." << std::endl;
+        LOG("The maximum texture slot is " + std::to_string(TextureSlot::COUNT - 1) + ". You want the " + std::to_string(slot) + " slot, the result will be unexpected.");
     }
-    m_CurrentSlot = slot;
+    m_CurrentSlot = static_cast<int>(slot);
     glActiveTexture(TextureSlot::TEXTURE0 + m_CurrentSlot);
     glBindTexture(TextureType::TEXTURE_2D, m_TextureId);
 }

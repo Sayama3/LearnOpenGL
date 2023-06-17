@@ -23,6 +23,7 @@ private:
     std::string m_Path;
     GLType m_PixelType;
     std::unordered_map<TextureParameterName , int> m_Params;
+    bool m_AutoDestroy;
     void SetParam(TextureParameterName name, int value, bool updateMap);
 public:
     TextureUsage m_TextureUsage;
@@ -35,7 +36,7 @@ public:
      * @param textureFormat The format of the texture (i.e. RGB, RGBA..). NONE = auto
      * @param pixelDataType The type of pixel (i.e. Byte, Short...). default = UNSIGNED_BYTE
      */
-    Texture2D(const std::string & path, TextureUsage textureUsage, enum TextureFormat textureFormat = TextureFormat::NONE, enum GLType pixelDataType = GLType::UNSIGNED_BYTE);
+    Texture2D(const std::string & path, TextureUsage textureUsage, bool autoDestroy = true, enum TextureFormat textureFormat = TextureFormat::NONE, enum GLType pixelDataType = GLType::UNSIGNED_BYTE);
 
     /**
      * Constructor a 1x1 2D texture with just a color.
@@ -43,9 +44,11 @@ public:
      */
     Texture2D(glm::vec4 color = {1.0f, 1.0f, 1.0f, 1.0f}, TextureUsage textureUsage = TextureUsage::Other);
 
-    Texture2D(const Texture2D& other);
+//    Texture2D(const Texture2D& other);
 
     ~Texture2D();
+
+    void Destroy();
 
     void Bind(unsigned int slot = 0);
     void Unbind();

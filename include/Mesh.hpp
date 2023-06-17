@@ -21,6 +21,7 @@ public:
     std::vector<Texture2D> m_Textures;
 
     Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture2D>& textures, BufferUsage usage = BufferUsage::STATIC_DRAW);
+    ~Mesh();
     void Draw(ShaderProgram& shader);
 
 private:

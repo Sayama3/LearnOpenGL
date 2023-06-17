@@ -5,6 +5,7 @@
 #include "Mesh.hpp"
 #include <stdio.h>
 #include <string.h>
+#include "Logger.hpp"
 
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture2D>& textures, BufferUsage usage) :
         m_Vertices(vertices),
@@ -16,6 +17,7 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>&
         m_EBO(m_Indices.data(), m_Indices.size(), usage)
 {
     this->SetupMesh();
+    LOG("Create Mesh");
 }
 
 void Mesh::SetupMesh() {
@@ -41,9 +43,13 @@ void Mesh::Draw(ShaderProgram &shader) {
         shader.SetUniform(uniformName, i);
     }
 
-    glActiveTexture(TextureSlot::TEXTURE0);
-
     m_VAO.Bind();
     m_EBO.Draw(GLDrawMode::TRIANGLES);
     m_VAO.Unbind();
+
+    glActiveTexture(TextureSlot::TEXTURE0);
+}
+
+Mesh::~Mesh() {
+    LOG("Destroy Mesh");
 }

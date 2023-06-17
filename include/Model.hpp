@@ -17,6 +17,7 @@
 class Model {
 public:
     Model(const std::string& path);
+    ~Model();
     void Draw(ShaderProgram& shader);
 private:
     std::vector<Mesh> m_Meshes;

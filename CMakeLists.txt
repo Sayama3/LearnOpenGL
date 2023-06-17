@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 3.25)
 # set enable the debugger (when the debug mode is enable?)
 set(CMAKE_CXX_FLAGS_DEBUG_INIT "-g")
 
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+    add_definitions(-DDEBUG)
+endif()
+
 # for visual studio : enable the math define
 # Remove because assimp already include the "_USE_MATH_DEFINES" preprocessor
 #add_definitions(-D_USE_MATH_DEFINES)

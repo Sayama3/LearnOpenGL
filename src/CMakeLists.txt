@@ -14,6 +14,8 @@ target_sources(OpenGL PRIVATE
         Cube.cpp
         Camera.cpp
         LightSource.cpp
+        Texture.cpp
+        Logger.cpp
         )
 
 add_subdirectory(Models)
