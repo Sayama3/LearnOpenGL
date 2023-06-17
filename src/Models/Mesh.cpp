@@ -7,7 +7,7 @@
 #include <string.h>
 #include "Logger.hpp"
 
-Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture2D>& textures, BufferUsage usage) :
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<std::shared_ptr<Texture2D>>& textures, BufferUsage usage) :
         m_Vertices(vertices),
         m_Indices(indices),
         m_Textures(textures),
@@ -35,10 +35,10 @@ void Mesh::Draw(ShaderProgram &shader) {
     memset(textureTypes, 0, sizeof(textureTypes));
 
     for (int i = 0; i < m_Textures.size(); ++i) {
-        m_Textures[i].Bind(static_cast<unsigned int>(i));
+        m_Textures[i]->Bind(static_cast<unsigned int>(i));
         std::string uniformName = "material.";
-        uniformName.append(TextureUsageToName(m_Textures[i].m_TextureUsage));
-        uniformName.append(std::to_string(textureTypes[m_Textures[i].m_TextureUsage]++));
+        uniformName.append(TextureUsageToName(m_Textures[i]->m_TextureUsage));
+        uniformName.append(std::to_string(textureTypes[m_Textures[i]->m_TextureUsage]++));
 
         shader.SetUniform(uniformName, i);
     }

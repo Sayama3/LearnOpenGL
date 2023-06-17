@@ -6,7 +6,7 @@
 #include "stb_image.h"
 #include "Logger.hpp"
 
-Texture2D::Texture2D(const std::string &path, TextureUsage textureUsage, bool autoDestroy, enum TextureFormat textureFormat, enum GLType pixelDataType) : m_Path(path), m_CurrentSlot(-1), m_TextureId(), format(textureFormat), m_Width(-1), m_Height(-1), m_NbrChannels(-1), m_PixelType(pixelDataType), m_Params(), m_AutoDestroy(autoDestroy), m_TextureUsage(textureUsage) {
+Texture2D::Texture2D(const std::string &path, TextureUsage textureUsage, enum TextureFormat textureFormat, enum GLType pixelDataType) : m_Path(path), m_CurrentSlot(-1), m_TextureId(), format(textureFormat), m_Width(-1), m_Height(-1), m_NbrChannels(-1), m_PixelType(pixelDataType), m_Params(), m_TextureUsage(textureUsage) {
     LOG("Creating \"" + m_Path + "\"");
     glGenTextures(1, &m_TextureId);
     glBindTexture(TextureType::TEXTURE_2D, m_TextureId);    // set the texture wrapping/filtering options (on currently bound texture)
@@ -97,7 +97,7 @@ Texture2D::Texture2D(glm::vec4 color, TextureUsage textureUsage): m_Path(), m_Cu
 }
 
 Texture2D::~Texture2D() {
-    if(m_AutoDestroy) Destroy();
+    Destroy();
 }
 
 void Texture2D::Destroy() {

@@ -13,14 +13,15 @@
 #include "ElementBufferObject.hpp"
 #include "VertexBufferLayout.hpp"
 #include "ShaderProgram.hpp"
+#include <memory>
 
 class Mesh {
 public:
     std::vector<Vertex> m_Vertices;
     std::vector<unsigned int> m_Indices;
-    std::vector<Texture2D> m_Textures;
+    std::vector<std::shared_ptr<Texture2D>> m_Textures;
 
-    Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture2D>& textures, BufferUsage usage = BufferUsage::STATIC_DRAW);
+    Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<std::shared_ptr<Texture2D>>& textures, BufferUsage usage = BufferUsage::STATIC_DRAW);
     ~Mesh();
     void Draw(ShaderProgram& shader);
 

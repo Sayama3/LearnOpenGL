@@ -13,7 +13,7 @@ Model::Model(const std::string &path) : m_Meshes(), m_Directory(path.substr(0, p
 
 void Model::Draw(ShaderProgram &shader) {
     for (auto& mesh : m_Meshes) {
-        mesh.Draw(shader);
+        mesh->Draw(shader);
     }
 }
 
@@ -60,12 +60,12 @@ void Model::processNode(aiNode *node, const aiScene *scene) {
     }
 }
 
-Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
+std::shared_ptr<Mesh> Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     std::vector<Vertex> vertices;
     vertices.reserve(mesh->mNumVertices);
     std::vector<unsigned int> indices;
     indices.reserve(mesh->mNumFaces * 3);
-    std::vector<Texture2D> textures;
+    std::vector<std::shared_ptr<Texture2D>> textures;
 
     // Process Vertex
     LOG("Processing the " + std::to_string(mesh->mNumVertices) + "vertices.");
@@ -114,32 +114,32 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 
         // 1. diffuse maps
         LOG("Adding " + std::to_string(DIFFUSE_COUNT) + " diffuse textures.");
-        std::vector<Texture2D> diffuseMaps = loadMaterialTextures(material, aiTextureType::aiTextureType_DIFFUSE, TextureUsage::Diffuse);
+        std::vector<std::shared_ptr<Texture2D>> diffuseMaps = loadMaterialTextures(material, aiTextureType::aiTextureType_DIFFUSE, TextureUsage::Diffuse);
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         // 2. specular maps
         LOG("Adding " + std::to_string(SPECULAR_COUNT) + " specular textures.");
-        std::vector<Texture2D> specularMaps = loadMaterialTextures(material, aiTextureType::aiTextureType_SPECULAR, TextureUsage::Specular);
+        std::vector<std::shared_ptr<Texture2D>> specularMaps = loadMaterialTextures(material, aiTextureType::aiTextureType_SPECULAR, TextureUsage::Specular);
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
         // 3. normal maps
         LOG("Adding " + std::to_string(NORMALS_COUNT) + " normal textures.");
-        std::vector<Texture2D> normalMaps = loadMaterialTextures(material, aiTextureType::aiTextureType_NORMALS, TextureUsage::Normal);
+        std::vector<std::shared_ptr<Texture2D>> normalMaps = loadMaterialTextures(material, aiTextureType::aiTextureType_NORMALS, TextureUsage::Normal);
         textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
         // 4. height maps
         LOG("Adding " + std::to_string(HEIGHT_COUNT) + " height textures.");
-        std::vector<Texture2D> heightMaps = loadMaterialTextures(material, aiTextureType::aiTextureType_HEIGHT, TextureUsage::Height);
+        std::vector<std::shared_ptr<Texture2D>> heightMaps = loadMaterialTextures(material, aiTextureType::aiTextureType_HEIGHT, TextureUsage::Height);
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
         // 4. ambient maps
         LOG("Adding " + std::to_string(AMBIENT_COUNT) + " ambient textures.");
-        std::vector<Texture2D> ambientMaps = loadMaterialTextures(material, aiTextureType::aiTextureType_AMBIENT, TextureUsage::Ambient);
+        std::vector<std::shared_ptr<Texture2D>> ambientMaps = loadMaterialTextures(material, aiTextureType::aiTextureType_AMBIENT, TextureUsage::Ambient);
         textures.insert(textures.end(), ambientMaps.begin(), ambientMaps.end());
     }
 
     LOG(std::string("Returning Meshes ").append(mesh->mName.C_Str()));
-    return Mesh(vertices, indices, textures);
+    return std::make_shared<Mesh>(vertices, indices, textures, BufferUsage::STATIC_DRAW);
 }
 
-std::vector<Texture2D> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, TextureUsage textureUsage) {
-    std::vector<Texture2D> textures;
+std::vector<std::shared_ptr<Texture2D>> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, TextureUsage textureUsage) {
+    std::vector<std::shared_ptr<Texture2D>> textures;
     for(unsigned int i = 0; i < mat->GetTextureCount(type); i++)
     {
         aiString str;
@@ -148,7 +148,7 @@ std::vector<Texture2D> Model::loadMaterialTextures(aiMaterial *mat, aiTextureTyp
         std::string fullPath = m_Directory + "/" + str.C_Str();
 
         for (const auto& tex: textures_loaded) {
-            if(tex.GetPath() == fullPath)
+            if(tex->GetPath() == fullPath)
             {
                 textures.push_back(tex);
                 skip = true;
@@ -157,16 +157,10 @@ std::vector<Texture2D> Model::loadMaterialTextures(aiMaterial *mat, aiTextureTyp
         }
 
         if(!skip) {
-            Texture2D texture(fullPath, textureUsage, false);
+            auto texture = std::make_shared<Texture2D>(fullPath, textureUsage);
             textures_loaded.push_back(texture);
             textures.push_back(texture);
         }
     }
     return textures;
-}
-
-Model::~Model() {
-    for (auto& tex: textures_loaded) {
-        tex.Destroy();
-    }
 }

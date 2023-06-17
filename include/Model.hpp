@@ -13,20 +13,20 @@
 #include "Mesh.hpp"
 #include "Texture2D.hpp"
 #include "ShaderProgram.hpp"
+#include <memory>
 
 class Model {
 public:
     Model(const std::string& path);
-    ~Model();
     void Draw(ShaderProgram& shader);
 private:
-    std::vector<Mesh> m_Meshes;
+    std::vector<std::shared_ptr<Mesh>> m_Meshes;
     std::string m_Directory;
-    std::vector<Texture2D> textures_loaded;
+    std::vector<std::shared_ptr<Texture2D>> textures_loaded;
     void loadModel(const std::string& path);
     void processNode(aiNode *node, const aiScene *scene);
-    Mesh processMesh(aiMesh *mesh, const aiScene *scene);
-    std::vector<Texture2D> loadMaterialTextures(aiMaterial *mat, aiTextureType type, TextureUsage textureUsage);
+    std::shared_ptr<Mesh> processMesh(aiMesh *mesh, const aiScene *scene);
+    std::vector<std::shared_ptr<Texture2D>> loadMaterialTextures(aiMaterial *mat, aiTextureType type, TextureUsage textureUsage);
 };
 
 
