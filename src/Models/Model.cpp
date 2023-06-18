@@ -7,9 +7,9 @@
 #include "Logger.hpp"
 #include "AssimpGLMHelpers.hpp"
 
-Model::Model(const std::string &path, glm::mat4 model) : m_Meshes(), m_Directory(path.substr(0, path.find_last_of('/'))), m_Model(model) {
+Model::Model(const std::string &path, glm::mat4 model, bool flipUVs) : m_Meshes(), m_Directory(path.substr(0, path.find_last_of('/'))), m_Model(model) {
     LOG("Creating Model " + path);
-    this->loadModel(path);
+    this->loadModel(path, flipUVs);
 }
 
 void Model::Draw(ShaderProgram &shader) {
@@ -18,7 +18,7 @@ void Model::Draw(ShaderProgram &shader) {
     }
 }
 
-void Model::loadModel(const std::string &path) {
+void Model::loadModel(const std::string &path, bool flipUVs) {
     LOG("Importing model");
     // Create an instance of the Importer class
     Assimp::Importer importer;
@@ -26,14 +26,19 @@ void Model::loadModel(const std::string &path) {
     // And have it read the given file with some example postprocessing
     // Usually - if speed is not the most important aspect for you - you'll
     // probably to request more postprocessing than we do in this example.
-    const aiScene* scene = importer.ReadFile( path,
-//                                              aiProcess_CalcTangentSpace        |
-                                              aiProcess_Triangulate             |
-//                                              aiProcess_JoinIdenticalVertices   |
-//                                              aiProcess_GenNormals   |
-                                              aiProcess_FlipUVs
-//                                              aiProcess_SortByPType
-                                              );
+    unsigned int flags =
+            aiProcess_CalcTangentSpace          |
+            aiProcess_Triangulate               |
+            aiProcess_JoinIdenticalVertices     |
+            aiProcess_GenNormals                |
+            aiProcess_SortByPType
+            ;
+    // As we already flip every texture, there is no need to flip th UVs expect if the UVs where expected to be for OpenGL.
+    // But as it's generally OpenGL that is reversed, I flipped the texture.
+    if(flipUVs) {
+        flags |= aiProcess_FlipUVs;
+    }
+    const aiScene* scene = importer.ReadFile( path, flags);
 
     // If the import failed, report it
     if (nullptr == scene) {
@@ -80,7 +85,9 @@ std::shared_ptr<Mesh> Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 
         vertex.Normal = AssimpGLMHelpers::GetGLMVec3(mesh->mNormals[i]);
 
-        if(mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
+        const auto numUVChannels = mesh->GetNumUVChannels();
+//        LOG(std::string("Mesh '").append( mesh->mName.C_Str()).append("' Has ").append(std::to_string(numUVChannels)).append( " UV channels."));
+        if(numUVChannels > 0) // does the mesh contain texture coordinates?
         {
             vertex.TexCoords = {mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y};
         }

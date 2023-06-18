@@ -22,7 +22,7 @@
 float _width = 800;
 float _height = 600;
 
-bool cursorEnable = true;
+bool cursorDisable = true;
 
 Camera camera({_width, _height}, {0,0,3});
 
@@ -30,6 +30,7 @@ Camera camera({_width, _height}, {0,0,3});
 double currentFrame = 0.0;
 double deltaTime = 0.001667; // Arbitrary 60fps
 double lastFrame = 0.0;
+bool spotLightEnable = false;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -55,7 +56,7 @@ int main() {
     }
     glfwMakeContextCurrent(window);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    cursorEnable = false;
+    cursorDisable = false;
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
@@ -148,7 +149,9 @@ int main() {
             }
 
            // Point Lights
-            for (int i = 0; i < sizeof(pointLightPositions)/ sizeof(pointLightPositions[0]); ++i) {
+           const int pointsLightsCount = sizeof(pointLightPositions)/ sizeof(pointLightPositions[0]);
+            cubeShader.SetUniform("pointsLightsCount", pointsLightsCount);
+            for (int i = 0; i < pointsLightsCount; ++i) {
                 cubeShader.SetUniform<glm::vec3>("pointLights["+std::to_string(i)+"].position", pointLightPositions[i]);
 
                 cubeShader.SetUniform<glm::vec3>("pointLights["+std::to_string(i)+"].ambient", {0.2f, 0.2f, 0.2f});
@@ -161,6 +164,8 @@ int main() {
             }
 
             // SpotLight
+            cubeShader.SetUniform<bool>("spotLightEnable", spotLightEnable);
+            if(spotLightEnable)
             {
                 cubeShader.SetUniform<glm::vec3>("spotLight.position", camera.GetPosition());
                 cubeShader.SetUniform<glm::vec3>("spotLight.direction", camera.GetForward());
@@ -218,6 +223,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     camera.OnScreenSizeChange({width, height});
 }
 bool hasPressCtrl = false;
+bool hasPressF = false;
 void processInput(GLFWwindow *window)
 {
     // Simple exit with the "escape" button for now.
@@ -228,27 +234,37 @@ void processInput(GLFWwindow *window)
     if(glfwGetKey(window, GLFWKey::KEY_LEFT_CONTROL) == GLFWKeyState::PRESS && !hasPressCtrl)
     {
         hasPressCtrl = !hasPressCtrl;
-        if(cursorEnable) {
+        if(cursorDisable) {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
             camera.ResetCursor();
         } else {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
-        cursorEnable = !cursorEnable;
+        cursorDisable = !cursorDisable;
     } else if(glfwGetKey(window, GLFWKey::KEY_LEFT_CONTROL) == GLFWKeyState::RELEASE && hasPressCtrl) {
         hasPressCtrl = !hasPressCtrl;
     }
 
-    camera.ProcessKeyboard(window, deltaTime);
+    if(!cursorDisable) {
+        camera.ProcessKeyboard(window, deltaTime);
+        if (glfwGetKey(window, GLFWKey::KEY_F) == GLFWKeyState::PRESS && !hasPressF) {
+            spotLightEnable = !spotLightEnable;
+            hasPressF = true;
+        } else if(glfwGetKey(window, GLFWKey::KEY_F) == GLFWKeyState::RELEASE) {
+            hasPressF = false;
+        }
+    } else {
+        hasPressF = false;
+    }
 }
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-    if(!cursorEnable) {
+    if(!cursorDisable) {
         camera.ProcessMouseCursor({xpos, ypos});
     }
 }
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    if(!cursorEnable) {
+    if(!cursorDisable) {
         camera.ProcessMouseScroll({xoffset, yoffset});
     }
 }

@@ -17,6 +17,7 @@ Texture2D::Texture2D(const std::string &path, TextureUsage textureUsage, enum Te
     this->SetParam(TextureParameterName::TEXTURE_MIN_FILTER, GL_LINEAR);
     this->SetParam(TextureParameterName::TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    // We flip the texture as we are on opengl.
     stbi_set_flip_vertically_on_load(true);
     const char* cstr = path.c_str();
     unsigned char *data = stbi_load(cstr, &m_Width, &m_Height, &m_NbrChannels, 0);
@@ -56,24 +57,6 @@ Texture2D::Texture2D(const std::string &path, TextureUsage textureUsage, enum Te
     stbi_image_free(data);
     Unbind();
 }
-
-//Texture2D::Texture2D(const Texture2D &other) : m_Path(other.m_Path), m_CurrentSlot(other.m_CurrentSlot), m_TextureId(other.m_TextureId), format(other.format), m_Width(other.m_Width), m_Height(other.m_Height), m_NbrChannels(other.m_NbrChannels), m_PixelType(other.m_PixelType), m_Params(other.m_Params), m_TextureUsage(other.m_TextureUsage){
-//    glBindTexture(TextureType::TEXTURE_2D, other.m_TextureId);
-//    void* pixels = malloc(other.m_Width * other.m_Height * other.m_NbrChannels * GetSizeOfGLType(other.m_PixelType));
-//    glGetTexImage(TextureType::TEXTURE_2D, 0, other.format, other.m_PixelType, pixels);
-//
-//    glGenTextures(1, &m_TextureId);
-//    glBindTexture(TextureType::TEXTURE_2D, m_TextureId);
-//
-//    for (const auto& param: m_Params) {
-//        SetParam(param.first, param.second, false);
-//    }
-//
-//    glTexImage2D(TextureType::TEXTURE_2D, 0, format, m_Width, m_Height, 0, format, m_PixelType, pixels);
-//    glGenerateMipmap(TextureType::TEXTURE_2D);
-//    free(pixels);
-//}
-
 
 Texture2D::Texture2D(glm::vec4 color, TextureUsage textureUsage): m_Path(), m_CurrentSlot(-1), m_TextureId(), format(TextureFormat::RGBA), m_Width(1), m_Height(1), m_NbrChannels(4), m_PixelType(GLType::UNSIGNED_BYTE), m_Params(), m_TextureUsage(textureUsage) {
     glGenTextures(1, &m_TextureId);

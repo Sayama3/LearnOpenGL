@@ -17,6 +17,14 @@ To correctly run the build, you must have the following architecture :
 
 ```text
 resources/
+├─ models/
+│  ├─ SurvivalGuitarBackpack/
+│  │  ├─ textures/
+│  │  │  ├─ Scene_-_Root_baseColor.jpeg
+│  │  │  ├─ Scene_-_Root_metallicRoughness.png
+│  │  │  ├─ Scene_-_Root_normal.png
+│  │  ├─ scene.bin
+│  │  ├─ scene.gltf
 ├─ shaders/
 │  ├─ container.frag
 │  ├─ container.vert
@@ -37,10 +45,12 @@ To rotate the camera you have to use the `Mouse`
 
 To enable/disable the cursor/input you can press `Left Ctrl`.
 
+To enable/disable the flashlight you can press `F`.
+
 To quit de demo you can press `Escape`.
 
 
 ## Demo
 Here is an example of the current state of the project.
 
-![](https://raw.githubusercontent.com/Sayama3/LearnOpenGL/main/README/gifs/Demo_LearnOpenGL_15062023_01.gif)
+![](https://raw.githubusercontent.com/Sayama3/LearnOpenGL/main/README/gifs/Demo_LearnOpenGL_18062023_01.gif)

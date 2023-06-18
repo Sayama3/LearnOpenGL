@@ -61,7 +61,9 @@ in vec2 TexCoords;
 uniform Material material;
 uniform DirectionalLight directionalLight;
 uniform PointLight pointLights[NUMBER_OF_POINT_LIGHT];
+uniform int pointLightsCount;
 uniform SpotLight spotLight;
+uniform bool spotLightEnable;
 
 uniform vec3 viewPos = vec3(1);
 
@@ -74,11 +76,13 @@ void main()
 
     vec3 color = CalcDirLight(material, directionalLight, normal, viewDir);
 
-    for (int i = 0; i < NUMBER_OF_POINT_LIGHT; i++) {
+    for (int i = 0; i < min(pointLightsCount, NUMBER_OF_POINT_LIGHT); i++) {
        color += CalcPointLight(material, pointLights[i], normal, FragPos, viewDir);
     }
 
-    color += CalcSpotLight(material, spotLight, normal, FragPos, viewDir);
+    if(spotLightEnable) {
+        color += CalcSpotLight(material, spotLight, normal, FragPos, viewDir);
+    }
 
     FragColor = vec4(color, 1.0);
 }

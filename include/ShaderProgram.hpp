@@ -12,6 +12,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "Shader.hpp"
+#include "Logger.hpp"
 
 
 
@@ -45,10 +46,12 @@ public:
 
     template<typename T>
     inline void SetUniform(const std::string & name, const T& value) {
-        throw std::runtime_error("Type not implemented.");
+        LOG_ERROR("Type not implemented.");
     }
 };
 
+template<>
+void ShaderProgram::SetUniform(const std::string & name, const bool& value);
 template<>
 void ShaderProgram::SetUniform(const std::string & name, const int& value);
 template<>

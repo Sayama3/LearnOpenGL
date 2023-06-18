@@ -27,12 +27,10 @@ ShaderProgram::ShaderProgram(const Shader &shader1, const Shader &shader2, const
 
 ShaderProgram::ShaderProgram(const std::vector<ShaderConstructor> &shaders) : m_Uniforms(), m_ShaderProgramId(glCreateProgram()) {
     auto shadersCount = shaders.size();
-    std::vector<Shader> instances;
-    instances.reserve(shadersCount);
     for (int i = 0; i < shadersCount; ++i) {
-        instances.push_back(shaders[i].CreateShader());
-        instances[i].CheckCompilation();
-        AttachShader(instances[i]);
+        auto shader = shaders[i].CreateShader();
+        shader.CheckCompilation();
+        AttachShader(shader);
     }
     Link();
 }
@@ -119,6 +117,14 @@ int ShaderProgram::GetUniformLocation(const std::string &name) {
     m_Uniforms.insert({name, location});
     return location;
 }
+
+
+template<>
+void ShaderProgram::SetUniform(const std::string & name, const bool& value) {
+    Bind();
+    glUniform1i(GetUniformLocation(name), value ? 1 : 0);
+}
+
 template<>
 void ShaderProgram::SetUniform(const std::string &name, const float& value) {
     // TODO: See if I should bind the ShaderProgram before setting the uniform. Seems fair to me.
