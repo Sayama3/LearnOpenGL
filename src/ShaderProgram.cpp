@@ -109,7 +109,8 @@ void ShaderProgram::Link() {
 }
 
 int ShaderProgram::GetUniformLocation(const std::string &name) {
-    if(m_Uniforms.contains(name)){
+
+    if(m_Uniforms.count(name) > 0){
         return m_Uniforms[name];
     }
 
