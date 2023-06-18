@@ -44,4 +44,5 @@ std::string LogTypeToString(LogType logType) {
         case LogType::Error:
             return "ERROR";
     }
+    return "UNKNOWN";
 }
