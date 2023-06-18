@@ -48,6 +48,10 @@ public:
 
     ~Texture2D();
 
+    Texture2D (const Texture2D&) = delete;
+    Texture2D& operator= (const Texture2D&) = delete;
+
+
     void Bind(unsigned int slot = 0);
     void Unbind();
 

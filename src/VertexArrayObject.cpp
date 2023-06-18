@@ -24,6 +24,8 @@ void VertexArrayObject::Unbind() const {
     glBindVertexArray(0);
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wint-to-void-pointer-cast"
 void VertexArrayObject::AddVertex(const VertexBufferObject & vertices, const VertexBufferLayout & layout) {
     Bind();
     vertices.Bind();
@@ -37,5 +39,6 @@ void VertexArrayObject::AddVertex(const VertexBufferObject & vertices, const Ver
         offset += element.count * element.GetSizeOfType();
     }
 }
+#pragma clang diagnostic pop
 
 

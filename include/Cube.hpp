@@ -31,6 +31,8 @@ private:
 
 public:
     explicit Cube();
+    Cube (const Cube&) = delete;
+    Cube& operator= (const Cube&) = delete;
     void Bind() const;
     void Unbind() const;
     void Draw() const;

@@ -8,6 +8,10 @@
 #include <string>
 #include "ShaderType.hpp"
 
+#define ViewMatrixName "view"
+#define ProjectionMatrixName "projection"
+#define ModelMatrixName "model"
+
 class Shader {
 private:
     const ShaderType m_ShaderType;
@@ -15,6 +19,8 @@ private:
 public:
     Shader(const std::string &shaderPath, ShaderType shaderType);
     ~Shader();
+    Shader (const Shader&) = delete;
+    Shader& operator= (const Shader&) = delete;
 
     bool CheckCompilation() const;
     unsigned int GetId() const;

@@ -34,6 +34,9 @@ private:
 
 public:
     explicit LightSource(float size = 1.0f);
+
+    LightSource (const LightSource&) = delete;
+    LightSource& operator= (const LightSource&) = delete;
     void Bind() const;
     void Unbind() const;
     void Draw() const;

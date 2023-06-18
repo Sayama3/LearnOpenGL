@@ -18,6 +18,9 @@ public:
     ElementBufferObject(const unsigned int *indices, unsigned int count, BufferUsage bufferUsage = BufferUsage::STATIC_DRAW);
     ~ElementBufferObject();
 
+    ElementBufferObject (const ElementBufferObject&) = delete;
+    ElementBufferObject& operator= (const ElementBufferObject&) = delete;
+
     void Bind() const;
     void Unbind() const;
 

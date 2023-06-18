@@ -15,6 +15,8 @@ private:
 public:
     VertexBufferObject(const void * vertices, unsigned int size, BufferUsage bufferUsage = BufferUsage::STATIC_DRAW);
     ~VertexBufferObject();
+    VertexBufferObject (const VertexBufferObject&) = delete;
+    VertexBufferObject& operator= (const VertexBufferObject&) = delete;
 
     void Bind() const;
     void Unbind() const;

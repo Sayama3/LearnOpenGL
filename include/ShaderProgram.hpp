@@ -36,6 +36,9 @@ public:
 
     ~ShaderProgram();
 
+    ShaderProgram (const ShaderProgram&) = delete;
+    ShaderProgram& operator= (const ShaderProgram&) = delete;
+
     void Bind() const;
     void Unbind() const;
     unsigned int GetId() const;

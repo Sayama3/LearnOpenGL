@@ -3,14 +3,16 @@
 //
 
 #include "Mesh.hpp"
-#include <stdio.h>
-#include <string.h>
+#include <string>
+#include "MathHelper.hpp"
 #include "Logger.hpp"
+#include "Shader.hpp"
 
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<std::shared_ptr<Texture2D>>& textures, BufferUsage usage) :
         m_Vertices(vertices),
         m_Indices(indices),
         m_Textures(textures),
+        m_Model(glm::identity<glm::mat4>()),
         m_Layout(Vertex::GetVertexBufferLayout()),
         m_VAO(false),
         m_VBO(m_Vertices.data(), m_Vertices.size() * sizeof(Vertex), usage),
@@ -30,7 +32,10 @@ void Mesh::SetupMesh() {
     m_EBO.Unbind();
 }
 
+//TODO: Add parent Matrix, for when we have a parent system.
 void Mesh::Draw(ShaderProgram &shader) {
+    shader.Bind();
+
     int textureTypes[TextureUsage::Count];
     memset(textureTypes, 0, sizeof(textureTypes));
 
@@ -42,6 +47,8 @@ void Mesh::Draw(ShaderProgram &shader) {
 
         shader.SetUniform(uniformName, i);
     }
+
+    shader.SetUniform<glm::mat4>(ModelMatrixName, this->m_Model);
 
     m_VAO.Bind();
     m_EBO.Draw(GLDrawMode::TRIANGLES);

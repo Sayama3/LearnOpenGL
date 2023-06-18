@@ -20,9 +20,14 @@ public:
     std::vector<Vertex> m_Vertices;
     std::vector<unsigned int> m_Indices;
     std::vector<std::shared_ptr<Texture2D>> m_Textures;
+    glm::mat4 m_Model;
 
     Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<std::shared_ptr<Texture2D>>& textures, BufferUsage usage = BufferUsage::STATIC_DRAW);
     ~Mesh();
+
+    Mesh (const Mesh&) = delete;
+    Mesh& operator= (const Mesh&) = delete;
+
     void Draw(ShaderProgram& shader);
 
 private:

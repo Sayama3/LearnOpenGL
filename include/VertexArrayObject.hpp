@@ -14,6 +14,8 @@ private:
 public:
     VertexArrayObject(bool shouldBind = false);
     ~VertexArrayObject();
+    VertexArrayObject (const VertexArrayObject&) = delete;
+    VertexArrayObject& operator= (const VertexArrayObject&) = delete;
 
     void Bind() const;
     void Unbind() const;

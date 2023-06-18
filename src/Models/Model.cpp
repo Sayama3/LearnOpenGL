@@ -5,8 +5,9 @@
 #include <filesystem>
 #include "Model.hpp"
 #include "Logger.hpp"
+#include "AssimpGLMHelpers.hpp"
 
-Model::Model(const std::string &path) : m_Meshes(), m_Directory(path.substr(0, path.find_last_of('/'))) {
+Model::Model(const std::string &path, glm::mat4 model) : m_Meshes(), m_Directory(path.substr(0, path.find_last_of('/'))), m_Model(model) {
     LOG("Creating Model " + path);
     this->loadModel(path);
 }
@@ -44,19 +45,22 @@ void Model::loadModel(const std::string &path) {
 
 
     LOG("Processing Root Node.");
-    processNode(scene->mRootNode, scene);
+    processNode(scene->mRootNode, scene, this->m_Model);
 }
 
-void Model::processNode(aiNode *node, const aiScene *scene) {
+void Model::processNode(aiNode *node, const aiScene *scene, const glm::mat4& parentMatrix) {
+    glm::mat4 currentNodeMatrix = parentMatrix * AssimpGLMHelpers::ConvertMatrixToGLMFormat(node->mTransformation);
     for (int i = 0; i < node->mNumMeshes; ++i) {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         LOG(std::string("Adding mesh ").append(mesh->mName.C_Str()));
-        m_Meshes.push_back(processMesh(mesh, scene));
+        auto m = processMesh(mesh, scene);
+        m->m_Model = currentNodeMatrix;
+        m_Meshes.push_back(m);
     }
 
     for (int i = 0; i < node->mNumChildren; ++i) {
         LOG(std::string("Processing node children ").append(node->mChildren[i]->mName.C_Str()));
-        processNode(node->mChildren[i], scene);
+        processNode(node->mChildren[i], scene, currentNodeMatrix);
     }
 }
 
@@ -72,9 +76,9 @@ std::shared_ptr<Mesh> Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     for (int i = 0; i < mesh->mNumVertices; ++i) {
         Vertex vertex{};
 
-        vertex.Position = {mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z};
+        vertex.Position = AssimpGLMHelpers::GetGLMVec3(mesh->mVertices[i]);;
 
-        vertex.Normal = {mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z};
+        vertex.Normal = AssimpGLMHelpers::GetGLMVec3(mesh->mNormals[i]);
 
         if(mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
         {

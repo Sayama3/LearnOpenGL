@@ -84,7 +84,9 @@ int main() {
 
     // === Models ===
 
-    Model model1("resources/models/SurvivalGuitarBackpack/scene.gltf");
+    glm::mat4 modelMatrix = glm::identity<glm::mat4>();
+    modelMatrix = glm::scale(modelMatrix, glm::vec3(0.01f));
+    Model model1("resources/models/SurvivalGuitarBackpack/scene.gltf", modelMatrix);
 
     cubeShader.Unbind();
 
@@ -132,8 +134,8 @@ int main() {
             cubeShader.Bind();
 
             // Updating projection & view matrix.
-            cubeShader.SetUniform<glm::mat4>("view", camera.GetViewMatrix());
-            cubeShader.SetUniform<glm::mat4>("projection", camera.GetProjectionMatrix());
+            cubeShader.SetUniform<glm::mat4>(ViewMatrixName, camera.GetViewMatrix());
+            cubeShader.SetUniform<glm::mat4>(ProjectionMatrixName, camera.GetProjectionMatrix());
             cubeShader.SetUniform<glm::vec3>("viewPos", camera.GetPosition());
 
             // Directional Light
@@ -197,7 +199,6 @@ int main() {
 //            }
 
             {
-                cubeShader.SetUniform<glm::mat4>("model", glm::identity<glm::mat4>());
                 model1.Draw(cubeShader);
             }
             cubeShader.Unbind();
