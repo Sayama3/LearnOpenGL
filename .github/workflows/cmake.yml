@@ -41,7 +41,21 @@ jobs:
       with:
         submodules: 'recursive'
 
-# Setup ubuntu
+    - name: Cache
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/vcpkg
+          ./build/vcpkg_installed
+          ${{ env.HOME }}/.cache/vcpkg/archives
+          ${{ env.XDG_CACHE_HOME }}/vcpkg/archives
+          ${{ env.LOCALAPPDATA }}\vcpkg\archives
+          ${{ env.APPDATA }}\vcpkg\archives
+        key: ${{ runner.os }}-${{ matrix.compiler }}-${{ env.BUILD_TYPE }}-${{ hashFiles('**/CMakeLists.txt') }}-${{ hashFiles('./vcpkg.json')}}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.BUILD_TYPE }}-      
+
+      # Setup ubuntu
     - name: Install X11 dependencies on Unix-like system
       if: ${{ contains(matrix.os, 'ubuntu') }}
       run: sudo apt-get update && sudo apt-get install -y xorg-dev
