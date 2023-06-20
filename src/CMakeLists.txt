@@ -14,6 +14,7 @@ target_sources(OpenGL PRIVATE
         Camera.cpp
         LightSource.cpp
         Logger.cpp
+        ImguiContainer.cpp
         )
 
 add_subdirectory(Models)
