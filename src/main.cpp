@@ -1,8 +1,11 @@
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-#include <iostream>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <stb_image.h>
+#include <iostream>
 #include <string>
 #include "SystemHelper.hpp"
 #include "ShaderProgram.hpp"
@@ -220,6 +223,8 @@ int main() {
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
+    _width = width;
+    _height = height;
     camera.OnScreenSizeChange({width, height});
 }
 bool hasPressCtrl = false;

@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.24)
 project(LearnOpenGL)
 
+add_subdirectory(glad)
+target_link_libraries(OpenGL PUBLIC glad)
+
 add_subdirectory(glfw)
 target_link_libraries(OpenGL PUBLIC glfw)
 
@@ -20,3 +23,10 @@ set(USE_SYSTEM_ASSIMP ON)
 
 add_subdirectory(assimp)
 target_link_libraries(OpenGL PUBLIC assimp)
+
+add_subdirectory(imgui)
+target_link_libraries(OpenGL PUBLIC imgui)
+target_include_directories(OpenGL PUBLIC
+        "${PROJECT_BINARY_DIR}"
+        "${PROJECT_SOURCE_DIR}/imgui"
+        )

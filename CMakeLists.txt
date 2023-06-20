@@ -15,7 +15,7 @@ endif()
 project(LearnOpenGL)
 
 
-add_executable(OpenGL include/SystemHelper.hpp)
+add_executable(OpenGL)
 
 # remark the c++ version to the 20 one
 # we use the c++ 20
